@@ -18,7 +18,16 @@
 					</a>
 				</li>
 				
-			
+				<li>
+						<a href="<?= base_url('/admin/students/attachment/create') ?>" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-user"></span><span class="mtext">Add Attachment Details</span>
+						</a>
+					</li>
+					<li>
+						<a href="<?= base_url('admin/attachment/get') ?>" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-user"></span><span class="mtext">Attachment Details</span>
+						</a>
+					</li>
 
 					<li>
 						<a href="<?= base_url('/admin/get-users') ?>" class="dropdown-toggle no-arrow">

@@ -10,11 +10,9 @@ class User extends Model
     protected $primaryKey       = 'id';
     protected $allowedFields    = ['full_name','email','password','role','password_reset_required','first_login'];
 
-
-    public function getFullNameById($userId)
+    public function getFullNameById($id)
     {
-        $user = $this->find($userId);
-        return $user ? $user['full_name'] : 'Unknown';
+        return $this->where('id', $id)->first()['full_name'];
     }
    
 }

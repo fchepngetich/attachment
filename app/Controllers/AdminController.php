@@ -37,7 +37,7 @@ class AdminController extends BaseController
     public function index()
     {
         $full_name = "Faith";
-        $students = new Student();
+        $students = new Students();
      
         $data=['full_name' => $full_name];
     

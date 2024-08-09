@@ -9,12 +9,32 @@ $routes->get('/', 'Home::index');
 
 $routes->group('admin', static function ($routes) {
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
-        //$routes->view('example-page','example-page');
-        $routes->get('home', 'AdminController::index', ['as' => 'admin.home']);
-       
-        
+        $routes->get('home', 'StudentsController::index', ['as' => 'admin.home']);
+        $routes->get('logout', 'AdminController::logoutHandler');
 
+       
     });
+    $routes->group('students', ['filter' => 'cifilter:auth'], static function ($routes) {
+        $routes->get('attachment/create', 'StudentsController::create', ['as' => 'attachment.create']);
+        $routes->post('attachment/store', 'StudentsController::store', ['as' => 'attachment.store']);
+         $routes->get('get', 'StudentController::index');
+        $routes->get('assign-supervisor/(:num)', 'StudentController::assignSupervisor/$1');
+        $routes->post('assign-supervisor/save', 'StudentController::saveAssignment');
+      
+    });
+
+    $routes->group('attachment', ['filter' => 'cifilter:auth'], static function ($routes) {
+        $routes->get('get', 'AttachmentController::index');
+       $routes->get('assign-supervisor/(:num)', 'AttachmentController::assignSupervisor/$1');
+       $routes->post('assign-supervisor/save', 'AttachmentController::saveAssignment');
+
+        $routes->get('change-supervisor/(:num)', 'AttachmentController::changeSupervisor/$1');
+
+        $routes->post('save-supervisor-change', 'AttachmentController::saveSupervisorChange');
+
+     
+   });
+
 
 
     $routes->group('roles', ['filter' => 'cifilter:auth'], function ($routes) {

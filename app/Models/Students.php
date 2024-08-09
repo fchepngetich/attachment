@@ -8,39 +8,38 @@ class Students extends Model
 {
     protected $table            = 'students';
     protected $primaryKey       = 'id';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
-    protected $allowedFields    = [];
+  
+    protected $allowedFields = [
+        'name',
+        'email',
+        'phone',
+        'password',
+        'year_study',
+        'semester',
+        'reg_no'
+    ];
 
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
+    protected $returnType = 'array';
 
-    protected array $casts = [];
-    protected array $castHandlers = [];
+  
+    protected $validationRules = [
+        'name' => 'required|string|max_length[255]',
+        'email' => 'required|valid_email|is_unique[students.email,id,{id}]',
+        'phone' => 'permit_empty|string|max_length[20]',
+        'password' => 'required|string|min_length[8]',
+        'year_study' => 'required|integer',
+        'semester' => 'required|integer',
+        'reg_no' => 'required|string|is_unique[students.reg_no,id,{id}]'
+    ];
 
-    // Dates
-    protected $useTimestamps = false;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    protected $validationMessages = [
+        'email' => [
+            'is_unique' => 'This email address is already registered.',
+        ],
+        'reg_no' => [
+            'is_unique' => 'This registration number is already in use.',
+        ],
+    ];
 
-    // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
-
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
+    protected $skipValidation = false;
 }

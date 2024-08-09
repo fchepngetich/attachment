@@ -1,74 +1,59 @@
 <?= $this->extend('backend/layout/pages-layout') ?>
 <?= $this->section('content') ?>
+
 <div class="container">
-    <div class="page-header ">
+    <div class="page-header">
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 <div class="title">
-                    <h4>Students Due For Attachment</h4>
+                    <h4>Change Supervisor for Student Attachment</h4>
                 </div>
-                 <nav aria-label="breadcrumb" role="navigation">
+                <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="<?= base_url('admin/home') ?>">Home</a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">
-                            Students List
+                            Change Supervisor
                         </li>
                     </ol>
                 </nav>
             </div>
-           
         </div>
     </div>
 
-<div class="container mt-5">
-    <table id="studentsTable" class="table table-sm table-hover table-striped table-borderless rounded shadow" style="width:100%;" role="grid">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Year of Study</th>
-                <th>Semester</th>
-                <th>Registration Number</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if(!empty($students)): ?>
-                <?php $count=1; foreach($students as $student): ?>
-                    <tr>
-                        <td><?= esc($count++) ?></td>
-                        
-                        <td><?= esc($student['name']); ?></td>
-                        <td><?= esc($student['email']); ?></td>
-                        <td><?= esc($student['phone']); ?></td>
-                        <td><?= esc($student['year_study']); ?></td>
-                        <td><?= esc($student['semester']); ?></td>
-                        <td><?= esc($student['reg_no']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+    <div class="container mt-5">
+        <?php if (session()->getFlashdata('message')): ?>
+            <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
+        <?php endif; ?>
+
+        <form action="<?= base_url('admin/attachment/save-supervisor-change') ?>" method="post">
+            <input type="hidden" name="attachment_id" value="<?= esc($attachment['id']) ?>">
+
+            <div class="form-group">
+                <label for="supervisor_id">Select New Supervisor</label>
+                <select class="form-control" id="supervisor_id" name="supervisor_id" required>
+                    <?php foreach ($supervisors as $supervisor): ?>
+                        <option value="<?= esc($supervisor['id']) ?>" <?= $supervisor['id'] == $attachment['supervisor_id'] ? 'selected' : '' ?>>
+                            <?= esc($supervisor['full_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="<?= base_url('/admin/attachment/get') ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
 </div>
-
-
-
-</div>
-
-<?= $this->endSection() ?>
 
 <?= $this->section('stylesheets')?>
-
 <link rel="stylesheet" href="/backend/src/plugins/datatables/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="/backend/src/plugins/datatables/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.min.css">
 <link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.structure.min.css">
 <link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.theme.min.css">
-
 <?= $this->endSection()?>
 
 <?= $this->section('scripts') ?>
@@ -79,8 +64,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script src="/extra-assets/jquery-ui-1.13.3/jquery-ui.min.js"></script>
 <script>
-  $(document).ready(function() {
-        $('#studentsTable').DataTable({
+    $(document).ready(function() {
+        $('#attachmentsTable').DataTable({
             "paging": true,
             "lengthChange": true,
             "searching": true,
@@ -91,4 +76,6 @@
         });
     });
 </script>
+<?= $this->endSection() ?>
+
 <?= $this->endSection() ?>

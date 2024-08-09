@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\Students;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Libraries\CIAuth;
 use App\Libraries\Hash;
@@ -20,53 +21,115 @@ class AuthController extends BaseController
         ];
         return view('backend/pages/auth/login', $data);
     }
-
-
- public function loginHandler()
-{
-    $fieldType = filter_var($this->request->getVar('login_id'), FILTER_VALIDATE_EMAIL) ? 'email' : 'full_name';
-
-    $validationRules = [
-        'login_id' => [
-            'rules' => 'required|is_not_unique[users.' . $fieldType . ']',
-            'errors' => [
-                'required' => ($fieldType == 'email') ? 'Email is required' : 'Full Name is required',
-                'is_not_unique' => ($fieldType == 'email') ? 'Email does not exist in the system' : 'Full Name does not exist in the system',
+    public function loginHandler()
+    {
+        $loginId = $this->request->getVar('login_id');
+        $fieldType = filter_var($loginId, FILTER_VALIDATE_EMAIL) ? 'email' : 'full_name';
+    
+        $validationRules = [
+            'login_id' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => ($fieldType == 'email') ? 'Email is required' : 'Full Name is required',
+                ]
+            ],
+            'password' => [
+                'rules' => 'required|min_length[5]|max_length[45]',
+                'errors' => [
+                    'required' => 'Password is required',
+                    'min_length' => 'Password must be at least 5 characters long',
+                    'max_length' => 'Password must not be longer than 45 characters',
+                ]
             ]
-        ],
-        'password' => [
-            'rules' => 'required|min_length[5]|max_length[45]',
-            'errors' => [
-                'required' => 'Password is required',
-                'min_length' => 'Password must be at least 5 characters long',
-                'max_length' => 'Password must not be longer than 45 characters',
-            ]
-        ]
-    ];
-
-    if (!$this->validate($validationRules)) {
-        return view('backend/pages/auth/login', [
-            'pageTitle' => 'Login',
-            'validation' => $this->validator
-        ]);
-    } else {
-        $user = new User();
-        $userInfo = $user->where($fieldType, $this->request->getVar('login_id'))->first();
-
-        $check_password = HASH::check($this->request->getVar('password'), $userInfo['password']);
-        if (!$check_password) {
-            return redirect()->to(base_url('admin/login'))->with('fail', 'Wrong password')->withInput();
+        ];
+    
+        if (!$this->validate($validationRules)) {
+            return view('backend/pages/auth/login', [
+                'pageTitle' => 'Login',
+                'validation' => $this->validator
+            ]);
         } else {
-            CIAuth::CIAuth($userInfo);
-
-            if ($userInfo['password_reset_required']) {
-                return redirect()->to(base_url('admin/change-password'))->with('info', 'Please change your password on first login.');
+            $userModel = new User();
+            $studentModel = new Students();
+            $isStudent = false;
+    
+            $userInfo = $studentModel->where($fieldType, $loginId)->first();
+    
+            if ($userInfo) {
+                $isStudent = true; 
+            } else {
+                $userInfo = $userModel->where($fieldType, $loginId)->first();
             }
-
-            return redirect()->to(base_url('admin/home'));
+    
+            if (!$userInfo) {
+                return redirect()->to(base_url('admin/login'))->with('fail', 'User does not exist')->withInput();
+            }
+    
+            $checkPassword = HASH::check($this->request->getVar('password'), $userInfo['password']);
+            if (!$checkPassword) {
+                return redirect()->to(base_url('admin/login'))->with('fail', 'Wrong password')->withInput();
+            } else {
+                CIAuth::CIAuth($userInfo);
+    
+                if ($userInfo['password_reset_required'] == 0) {
+                    return redirect()->to(base_url('admin/change-password'))->with('info', 'Please change your password on first login.');
+                }
+    
+                if ($isStudent) {
+                    return redirect()->to(base_url('admin/students/attachment/create'));
+                } else {
+                    return redirect()->to(base_url('admin/home'));
+                }
+            }
         }
     }
-}
+    
+    
+//  public function loginHandler()
+// {
+//     $fieldType = filter_var($this->request->getVar('login_id'), FILTER_VALIDATE_EMAIL) ? 'email' : 'full_name';
+
+//     $validationRules = [
+//         'login_id' => [
+//             'rules' => 'required|is_not_unique[users.' . $fieldType . ']',
+//             'errors' => [
+//                 'required' => ($fieldType == 'email') ? 'Email is required' : 'Full Name is required',
+//                 'is_not_unique' => ($fieldType == 'email') ? 'Email does not exist in the system' : 'Full Name does not exist in the system',
+//             ]
+//         ],
+//         'password' => [
+//             'rules' => 'required|min_length[5]|max_length[45]',
+//             'errors' => [
+//                 'required' => 'Password is required',
+//                 'min_length' => 'Password must be at least 5 characters long',
+//                 'max_length' => 'Password must not be longer than 45 characters',
+//             ]
+//         ]
+//     ];
+
+//     if (!$this->validate($validationRules)) {
+//         return view('backend/pages/auth/login', [
+//             'pageTitle' => 'Login',
+//             'validation' => $this->validator
+//         ]);
+//     } else {
+//         $user = new User();
+//         $userInfo = $user->where($fieldType, $this->request->getVar('login_id'))->first();
+
+//         $check_password = HASH::check($this->request->getVar('password'), $userInfo['password']);
+//         if (!$check_password) {
+//             return redirect()->to(base_url('admin/login'))->with('fail', 'Wrong password')->withInput();
+//         } else {
+//             CIAuth::CIAuth($userInfo);
+
+//             if ($userInfo['password_reset_required']) {
+//                 return redirect()->to(base_url('admin/change-password'))->with('info', 'Please change your password on first login.');
+//             }
+
+//             return redirect()->to(base_url('admin/home'));
+//         }
+//     }
+// }
 
 
 
@@ -139,7 +202,7 @@ class AuthController extends BaseController
 {
     $email = \Config\Services::email();
 
-    $email->setFrom('your@example.com', 'Change Management System');
+    $email->setFrom('your@example.com', 'Attachment Portal');
     $email->setTo($to);
     $email->setSubject('Password Reset');
 
@@ -189,7 +252,7 @@ class AuthController extends BaseController
         <body>
             <div class='container'>
                 <div class='header'>
-                    <h2>Change Management System</h2>
+                    <h2>Attachment Portal</h2>
                 </div>
                 <div class='content'>
                     <p>Dear {$username},</p>
@@ -197,12 +260,12 @@ class AuthController extends BaseController
                     <p><strong>Username:</strong> {$to}</p>
                     <p><strong>Password:</strong> {$newPassword}</p>
                     <p>You can log in to the system using the following link:</p>
-                    <p><a href='https://demo.zetech.ac.ke/cms/admin/home'>Change Management System</a></p>
+                    <p><a href='https://demo.zetech.ac.ke/cms/admin/home'>Attachment Portal</a></p>
                     <p>Please make sure to change your password after logging in for the first time.</p>
                 </div>
                 <div class='footer'>
                     <p>Best Regards,</p>
-                    <p>Change Management System Team</p>
+                    <p>Attachment Portal Team</p>
                 </div>
             </div>
         </body>
@@ -227,7 +290,11 @@ class AuthController extends BaseController
         );
         return view('backend/pages/auth/change_password', $data);
     }
-
+    public function logoutHandler()
+    {
+        CIAuth::forget();
+        return redirect()->to(base_url('admin/login'))->with('fail', 'You are logged out');
+    }
 
    
 }
