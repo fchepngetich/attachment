@@ -20,6 +20,8 @@ $routes->group('admin', static function ($routes) {
          $routes->get('get', 'StudentController::index');
         $routes->get('assign-supervisor/(:num)', 'StudentController::assignSupervisor/$1');
         $routes->post('assign-supervisor/save', 'StudentController::saveAssignment');
+
+
       
     });
 
@@ -27,10 +29,10 @@ $routes->group('admin', static function ($routes) {
         $routes->get('get', 'AttachmentController::index');
        $routes->get('assign-supervisor/(:num)', 'AttachmentController::assignSupervisor/$1');
        $routes->post('assign-supervisor/save', 'AttachmentController::saveAssignment');
-
         $routes->get('change-supervisor/(:num)', 'AttachmentController::changeSupervisor/$1');
-
         $routes->post('save-supervisor-change', 'AttachmentController::saveSupervisorChange');
+        $routes->get('attachment-details', 'AttachmentController::viewAttachmentDetails');
+
 
      
    });

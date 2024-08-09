@@ -36,7 +36,7 @@ class AdminController extends BaseController
     
     public function index()
     {
-        $full_name = "Faith";
+        $full_name = CIAuth::StudentName();
         $students = new Students();
      
         $data=['full_name' => $full_name];

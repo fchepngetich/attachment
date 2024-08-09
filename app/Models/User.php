@@ -8,7 +8,7 @@ class User extends Model
 {
     protected $table            = 'users';
     protected $primaryKey       = 'id';
-    protected $allowedFields    = ['full_name','email','password','role','password_reset_required','first_login'];
+    protected $allowedFields    = ['full_name','email','password','role','password_reset_required','first_login','usertype'];
 
     public function getFullNameById($id)
     {

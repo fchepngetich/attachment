@@ -16,7 +16,8 @@ class Students extends Model
         'password',
         'year_study',
         'semester',
-        'reg_no'
+        'reg_no',
+        'usertype',
     ];
 
     protected $returnType = 'array';

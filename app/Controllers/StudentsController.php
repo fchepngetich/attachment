@@ -42,8 +42,7 @@ class StudentsController extends BaseController
         public function create()
         {
             $userModel = new User();
-            $userId = CIAuth::id();
-            $fullName = $userModel->getFullNameById($userId);
+            $fullName = CIAuth::StudentName();
           
             $data = [
                 'full_name' => $fullName,

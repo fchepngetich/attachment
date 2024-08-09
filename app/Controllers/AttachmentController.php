@@ -54,6 +54,27 @@ class AttachmentController extends BaseController
     
         return view('backend/pages/students/student-list', $data);
     }
+
+    public function viewAttachmentDetails()
+    {
+        $attachmentModel = new Attachment();
+        $id = CIAuth::id();
+        $fullName = CIAuth::StudentName();
+
+
+        $attachmentDetails = $attachmentModel->where('student_id', $id)->first();
+
+        if (!$attachmentDetails) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Attachment not found');
+        }
+
+        $data = [
+            'attachmentDetails' => $attachmentDetails,
+            'full_name' =>$fullName,
+        ];
+
+        return view('backend/pages/students/attachment-details', $data);
+    }
     
 
     public function assignSupervisor($attachmentId)
