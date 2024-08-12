@@ -61,7 +61,6 @@ class AttachmentController extends BaseController
         $id = CIAuth::id();
         $fullName = CIAuth::StudentName();
 
-
         $attachmentDetails = $attachmentModel->where('student_id', $id)->first();
 
         if (!$attachmentDetails) {
@@ -117,7 +116,6 @@ class AttachmentController extends BaseController
 
     $supervisor = $userModel->find($supervisorId);
     $supervisorName = $supervisor['full_name'];  
-
     $attachmentModel->update($attachmentId, ['supervisor_id' => $supervisorId]);
 
     $logModel->save([
@@ -185,5 +183,63 @@ class AttachmentController extends BaseController
         }
     }
     
+    public function students()
+    {
+        $full_name = CIAuth::fullName();
+
+        $studentModel = new attachment();
+        $supervisor_id = CIAuth::id(); 
+        $data = ['full_name' => $full_name];
+        $data['students'] = $studentModel->where('supervisor_id', $supervisor_id)->findAll();
+
+        return view('backend/pages/students/my-students', $data);
+    }
+
+    public function assessmentForm($attachmentId)
+    {
+        $attachmentModel = new Attachment();
+        $attachment = $attachmentModel->find($attachmentId);
+    
+        if (!$attachment) {
+            return redirect()->to(base_url('admin/attachment/my-students'))->with('error', 'Attachment not found');
+        }
+    
+        $full_name = CIAuth::fullName();
+    
+        $data = [
+            'attachment' => $attachment,
+            'full_name' => $full_name
+        ];
+    
+        return view('backend/pages/students/confirm_assessment_form', $data);
+    }
+    
+    
+
+    public function confirmAssessment()
+{
+    $attachmentId = $this->request->getPost('attachment_id');
+    $comments = $this->request->getPost('comments');
+    $userId = CIAuth::id(); 
+
+    $attachmentModel = new Attachment();
+    $logModel = new Logs(); 
+
+    $attachmentModel->update($attachmentId, 
+    ['is_assessment_confirmed' => true,  'supervisor_comments' => $comments, 'assessment_confirmed_at' => date('Y-m-d H:i:s')]);
+
+    $logModel->save([
+        'action' => sprintf(
+            'Assessment confirmed for attachment ID %s',
+            esc($attachmentId)
+        ),
+        'user_id' => $userId,
+        'attachment_id' => $attachmentId,
+        'supervisor_id' => $userId
+    ]);
+
+    return redirect()->to(base_url('admin/attachment/my-students'))->with('message', 'Assessment confirmed successfully');
+}
+
 
 }

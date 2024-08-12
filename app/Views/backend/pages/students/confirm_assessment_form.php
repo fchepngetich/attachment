@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 <div class="title">
-                    <h4>Attached Students</h4>
+                    <h4>Students Attachment Details</h4>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
@@ -14,7 +14,7 @@
                             <a href="<?= base_url('admin/home') ?>">Home</a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">
-                           Attached Students
+                           Students Attachment Details
                         </li>
                     </ol>
                 </nav>
@@ -26,48 +26,16 @@
         <?php if (session()->getFlashdata('message')): ?>
             <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
         <?php endif; ?>
-
-        <table id="attachmentsTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Company</th>
-                    <th>Company Location</th>
-                    <th>County</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Supervisor</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($attachments as $attachment): ?>
-                    <tr>
-                        <td><?= esc($attachment['student_name']) ?></td>
-                        <td><?= esc($attachment['company_name']) ?></td>
-                        <td><?= esc($attachment['company_location']) ?></td>
-                        <td><?= esc($attachment['county']) ?></td>
-                        <td><?= esc($attachment['date_start']) ?></td>
-                        <td><?= esc($attachment['date_end']) ?></td>
-                        <td>
-                            <?php if ($attachment['supervisor']): ?>
-                                <?= esc($attachment['supervisor']['full_name']) ?>
-                            <?php else: ?>
-                                Not Assigned
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <?php if ($attachment['supervisor']): ?>
-                                <a href="<?= base_url('admin/attachment/change-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Change Supervisor</a>
-                            <?php else: ?>
-                                <a href="<?= base_url('admin/attachment/assign-supervisor/' . $attachment['id']) ?>" class="btn btn-primary btn-sm">Assign Supervisor</a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+    
+<form action="<?php echo base_url('admin/attachment/confirm-assessment'); ?>" method="post">
+    <input type="hidden" name="attachment_id" value="<?php echo $attachment['id']; ?>">
+    <div class="form-group">
+        <label for="comments">Supervisor Comments:</label>
+        <textarea name="comments" id="comments" class="form-control" rows="4" required></textarea>
     </div>
+    <button type="submit" class="btn btn-success">Confirm Assessment</button>
+</form>
+
 </div>
 
 <?= $this->section('stylesheets')?>
@@ -88,7 +56,7 @@
 <script src="/extra-assets/jquery-ui-1.13.3/jquery-ui.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('#attachmentsTable').DataTable({
+        $('#studentsTable').DataTable({
             "paging": true,
             "lengthChange": true,
             "searching": true,
@@ -97,6 +65,7 @@
             "autoWidth": false,
             "responsive": true,
         });
+   
     });
 </script>
 <?= $this->endSection() ?>

@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 <div class="title">
-                    <h4>Attached Students</h4>
+                    <h4>Change Supervisor for Student Attachment</h4>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
@@ -14,7 +14,7 @@
                             <a href="<?= base_url('admin/home') ?>">Home</a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">
-                           Attached Students
+                            Change Supervisor
                         </li>
                     </ol>
                 </nav>
@@ -27,46 +27,23 @@
             <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
         <?php endif; ?>
 
-        <table id="attachmentsTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Company</th>
-                    <th>Company Location</th>
-                    <th>County</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Supervisor</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($attachments as $attachment): ?>
-                    <tr>
-                        <td><?= esc($attachment['student_name']) ?></td>
-                        <td><?= esc($attachment['company_name']) ?></td>
-                        <td><?= esc($attachment['company_location']) ?></td>
-                        <td><?= esc($attachment['county']) ?></td>
-                        <td><?= esc($attachment['date_start']) ?></td>
-                        <td><?= esc($attachment['date_end']) ?></td>
-                        <td>
-                            <?php if ($attachment['supervisor']): ?>
-                                <?= esc($attachment['supervisor']['full_name']) ?>
-                            <?php else: ?>
-                                Not Assigned
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <?php if ($attachment['supervisor']): ?>
-                                <a href="<?= base_url('admin/attachment/change-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Change Supervisor</a>
-                            <?php else: ?>
-                                <a href="<?= base_url('admin/attachment/assign-supervisor/' . $attachment['id']) ?>" class="btn btn-primary btn-sm">Assign Supervisor</a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        <form action="<?= base_url('admin/attachment/save-supervisor-change') ?>" method="post">
+            <input type="hidden" name="attachment_id" value="<?= esc($attachment['id']) ?>">
+
+            <div class="form-group">
+                <label for="supervisor_id">Select New Supervisor</label>
+                <select class="form-control" id="supervisor_id" name="supervisor_id" required>
+                    <?php foreach ($supervisors as $supervisor): ?>
+                        <option value="<?= esc($supervisor['id']) ?>" <?= $supervisor['id'] == $attachment['supervisor_id'] ? 'selected' : '' ?>>
+                            <?= esc($supervisor['full_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="<?= base_url('/admin/attachment/get') ?>" class="btn btn-secondary">Cancel</a>
+        </form>
     </div>
 </div>
 

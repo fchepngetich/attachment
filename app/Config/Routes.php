@@ -18,11 +18,10 @@ $routes->group('admin', static function ($routes) {
         $routes->get('attachment/create', 'StudentsController::create', ['as' => 'attachment.create']);
         $routes->post('attachment/store', 'StudentsController::store', ['as' => 'attachment.store']);
          $routes->get('get', 'StudentController::index');
-        $routes->get('assign-supervisor/(:num)', 'StudentController::assignSupervisor/$1');
-        $routes->post('assign-supervisor/save', 'StudentController::saveAssignment');
+        // $routes->get('assign-supervisor/(:num)', 'StudentController::assignSupervisor/$1');
+        // $routes->post('assign-supervisor/save', 'StudentController::saveAssignment');
+        $routes->get('confirm-assessment/(:num)', 'StudentsController::confirmAssessmentByStudent/$1');
 
-
-      
     });
 
     $routes->group('attachment', ['filter' => 'cifilter:auth'], static function ($routes) {
@@ -32,12 +31,11 @@ $routes->group('admin', static function ($routes) {
         $routes->get('change-supervisor/(:num)', 'AttachmentController::changeSupervisor/$1');
         $routes->post('save-supervisor-change', 'AttachmentController::saveSupervisorChange');
         $routes->get('attachment-details', 'AttachmentController::viewAttachmentDetails');
+        $routes->get('my-students', 'AttachmentController::students');
+        $routes->get('assessment-form/(:num)', 'AttachmentController::assessmentForm/$1');
+        $routes->post('confirm-assessment', 'AttachmentController::confirmAssessment');
 
-
-     
    });
-
-
 
     $routes->group('roles', ['filter' => 'cifilter:auth'], function ($routes) {
         $routes->get('/', 'RolesController::index');

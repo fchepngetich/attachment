@@ -14,14 +14,22 @@
 			<ul id="accordion-menu">
 				<li>
 					<a href="<?= base_url('admin/home') ?>" class="dropdown-toggle no-arrow">
-						<span class="micon dw dw-home"></span><span class="mtext">Home</span>
+						<span class="micon dw dw-home"></span><span class="mtext">Students List</span>
 					</a>
 				</li>
-
-				
 				<li>
 					<?php if (App\Libraries\CIAuth::userType() === 'lecturer'): ?>
+						<li>
+						<a href="<?= base_url('/admin/attachment/get') ?>" class="dropdown-toggle no-arrow">
+						<span class="micon dw dw-user"></span><span class="mtext">Attached Students</span>
+					</a>
+					</li>
 
+					<li>
+						<a href="<?= base_url('/admin/attachment/my-students') ?>" class="dropdown-toggle no-arrow">
+						<span class="micon dw dw-user"></span><span class="mtext">My Students</span>
+					</a>
+					</li>
 
 					<li>
 						<a href="<?= base_url('/admin/get-users') ?>" class="dropdown-toggle no-arrow">

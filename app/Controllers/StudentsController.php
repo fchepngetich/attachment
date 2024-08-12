@@ -22,26 +22,37 @@ class StudentsController extends BaseController
         $this->db = db_connect();
     }
     public function index()
-    {
-        $userModel = new User();
-        $userId = CIAuth::id();
+{
+    $userId = CIAuth::id();
+    $userType = CIAuth::userType(); 
 
-        $full_name = $userModel->getFullNameById($userId);
-        $studentsModel = new Students();
-        
-        $students = $studentsModel->findAll();
-        
-        $data = [
-            'full_name' => $full_name,
-            'students' => $students,
-        ];
-    
-        return view('backend/pages/home', $data);
+    // Initialize models
+    $studentsModel = new Students();
+    $usersModel = new User(); 
+
+    if ($userType === 'student') {
+        $student = $studentsModel->where('id', $userId)->first(); 
+        $full_name = $student['full_name'] ?? 'Unknown Student'; 
+    } elseif ($userType === 'user') {
+        $user = $usersModel->find($userId);
+        $full_name = $user['full_name'] ?? 'Unknown User';
+    } else {
+        $full_name = 'Guest';
     }
+
+    $students = $studentsModel->findAll();
+
+    $data = [
+        'full_name' => $full_name,
+        'students' => $students,
+    ];
+
+    return view('backend/pages/home', $data);
+}
+
    
         public function create()
         {
-            $userModel = new User();
             $fullName = CIAuth::StudentName();
           
             $data = [
@@ -141,5 +152,29 @@ class StudentsController extends BaseController
                 return redirect()->back()->withInput()->with('error', 'Failed to create attachment');
             }
         }
+
+        public function confirmAssessmentByStudent($attachmentId)
+{
+    $attachmentModel = new Attachment();
+    $attachment = $attachmentModel->find($attachmentId);
+
+    if (!$attachment) {
+        return redirect()->to(base_url('admin/attachment/attachment-details'))->with('error', 'Invalid Attachment ID');
+    }
+
+    $studentId = CIAuth::id(); 
+    if ($attachment['student_id'] != $studentId) {
+        return redirect()->to(base_url('admin/attachment/attachment-details'))->with('error', 'You are not authorized to confirm this assessment');
+    }
+
+    // Confirm the assessment
+    $attachmentModel->update($attachmentId, [
+        'is_student_confirmed' => true,
+        'confirmation_date' => date('Y-m-d H:i:s') 
+    ]);
+
+    return redirect()->to(base_url('admin/attachment/attachment-details'))->with('message', 'Assessment confirmed successfully');
+}
+
     }
     

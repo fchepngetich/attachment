@@ -21,10 +21,10 @@
         </div>
     </div>
 
-    <div class="container mt-5">
-        <div class="row">
+    <div class="container rounded shadow mt-5">
+        <div class="row mb-3">
             <!-- Company Name -->
-            <div class="col-md-4 mb-2">
+            <div class="col-md mt-4 -4 mb-2">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Company Name</h5>
@@ -33,7 +33,7 @@
                 </div>
             </div>
             <!-- County -->
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mt-4 mb-2">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">County</h5>
@@ -42,7 +42,7 @@
                 </div>
             </div>
             <!-- Company Location -->
-            <div class="col-md-4 mb-2">
+            <div class="col-md-4 mt-4 mb-2">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Company Location</h5>
@@ -97,9 +97,37 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-4 ">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Assessment Status</h5>
+                        <p class="card-text">
+                        <p class="card-text">
+                            <?php
+                                $isSupervisorConfirmed = esc($attachmentDetails['is_assessment_confirmed']);
+                                $isStudentConfirmed = esc($attachmentDetails['is_student_confirmed']);
+                                
+                                if ($isSupervisorConfirmed && $isStudentConfirmed) {
+                                    echo '<span class="badge badge-success">Fully Assessed</span>';
+                                } else {
+                                    if ($isSupervisorConfirmed && !$isStudentConfirmed) {
+                                        echo '<a href="' . base_url('/admin/students/confirm-assessment/' . esc($attachmentDetails['id'])) . '" class="btn btn-primary">Confirm Assessment</a>';
+                                    } elseif (!$isSupervisorConfirmed) {
+                                        echo '<span class="badge badge-warning">Pending</span>';
+                                    }
+                                }
+                            ?>
+                        </p>
+
+
+
+                       
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group mt-3">
+        <div class="form-group mb-3">
             <a href="<?= base_url('admin/home') ?>" class="btn btn-sm btn-secondary">Back</a>
         </div>
     </div>
