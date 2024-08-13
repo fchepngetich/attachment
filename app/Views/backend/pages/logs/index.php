@@ -24,8 +24,8 @@
 
             <tr>
                 <th>#</th>
-                <th>Message</th>
                 <th>User</th>
+                <th>Message</th>
                 <th>Created At</th>
             </tr>
         </thead>
@@ -33,8 +33,8 @@
                 <?php $count=1; foreach ($logs as $log): ?>
                     <tr>
                         <td><?= esc($count++) ?></td>
-                        <td><?= esc($log['message']) ?></td>
                         <td><?= esc(getUsernameById($log['user_id'])) ?></td>
+                        <td><?= esc($log['action']) ?></td>
                         <td><?= esc($log['created_at']) ?></td>
                     </tr>
                 <?php endforeach; ?>

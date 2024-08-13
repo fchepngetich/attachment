@@ -108,7 +108,7 @@ public function createUser()
                     'regex_match' => 'Email must be a zetech.ac.ke email address',
                 ]
             ],
-            'role' => [
+            'role_id' => [
                 'rules' => 'required',
                 'errors' => [
                     'required' => 'Role is required',
@@ -131,9 +131,11 @@ public function createUser()
             $data = [
                 'full_name' => $this->request->getPost('full_name'),
                 'email' => $this->request->getPost('email'),
-                'role' => $this->request->getPost('role'),
+                'role_id' => (int) $this->request->getPost('role_id'), // Convert role_id to integer
                 'password' => $hashedPassword,
             ];
+
+        
 
             if ($userModel->save($data)) {
                 $userId = \App\Libraries\CIAuth::id(); 
@@ -141,7 +143,7 @@ public function createUser()
                 log_action($userId, $message);
 
                 $email = \Config\Services::email();
-                $email->setFrom('noreplyzetech@changemanagementsystem.com', 'Change Management System');
+                $email->setFrom('noreplyzetech@attachmentportal.com', 'Attachment Portal');
                 $email->setTo($data['email']);
                 $email->setCC('another@another-example.com'); 
                 $email->setBCC('them@their-example.com'); 
@@ -150,12 +152,12 @@ public function createUser()
                 $message = "
                     <html>
                     <head>
-                        <title>CMS User Credentials</title>
+                        <title>Attachment Portal User Credentials</title>
                     </head>
                     <body>
-                        <h2>Welcome to the Change Management System</h2>
+                        <h2>Welcome to the Attachment</h2>
                         <p>Dear {$data['full_name']},</p>
-                        <p>You have been added as a user in the CMS system. Here are your credentials:</p>
+                        <p>You have been added as a user in the Attachment Portal. Here are your credentials:</p>
                         <table>
                             <tr>
                                 <td><strong>Username:</strong></td><td>{$data['email']}</td>
@@ -164,13 +166,13 @@ public function createUser()
                                 <td><strong>Password:</strong></td><td>{$password}</td>
                             </tr>
                             <tr>
-                                <td><strong>Website Link:</strong></td><td><a href='https://demo.zetech.ac.ke/cms/admin/home'>Change Management System</a></td>
+                                <td><strong>Website Link:</strong></td><td><a href='#'>Change Management System</a></td>
                             </tr>
                         </table>
                         <p>Please make sure to change your password after your first login.</p>
                         <br>
                         <p>Best Regards,</p>
-                        <p>Change Management System Team</p>
+                        <p>Attachment Portal Team</p>
                     </body>
                     </html>";
 
@@ -227,6 +229,297 @@ public function createUser()
         return implode('', $password);
     }
 
+    public function createStudent()
+{
+    $request = \Config\Services::request();
+
+    if ($request->isAJAX()) {
+        $validation = \Config\Services::validation();
+
+        $validation->setRules([
+            'name' => [
+                'rules' => 'required|string|max_length[255]',
+                'errors' => [
+                    'required' => 'Name is required',
+                ]
+            ],
+            'email' => [
+                'rules' => 'required|valid_email|is_unique[students.email]',
+                'errors' => [
+                    'required' => 'Email is required',
+                    'valid_email' => 'Please provide a valid email address',
+                    'is_unique' => 'This email is already registered',
+                ]
+            ],
+            'phone' => [
+                'rules' => 'permit_empty|string|max_length[20]',
+            ],
+            'year_study' => [
+                'rules' => 'required|integer',
+                'errors' => [
+                    'required' => 'Year of study is required',
+                ]
+            ],
+            'semester' => [
+                'rules' => 'required|integer',
+                'errors' => [
+                    'required' => 'Semester is required',
+                ]
+            ],
+            'reg_no' => [
+                'rules' => 'required|string|is_unique[students.reg_no]',
+                'errors' => [
+                    'required' => 'Registration number is required',
+                    'is_unique' => 'This registration number is already in use',
+                ]
+            ]
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            $errors = $validation->getErrors();
+            return $this->response->setJSON([
+                'status' => 0,
+                'token' => csrf_hash(),
+                'errors' => $errors
+            ]);
+        } else {
+            $studentModel = new Students();
+
+            $regNo = $this->request->getPost('reg_no');
+            $hashedPassword = password_hash($regNo, PASSWORD_DEFAULT);
+
+            $data = [
+                'name' => $this->request->getPost('name'),
+                'email' => $this->request->getPost('email'),
+                'phone' => $this->request->getPost('phone'),
+                'year_study' => $this->request->getPost('year_study'),
+                'semester' => $this->request->getPost('semester'),
+                'reg_no' => $regNo,
+                'password' => $hashedPassword,
+                'usertype' => 'student',
+            ];
+
+            if ($studentModel->save($data)) {
+                // Send Email Notification
+                $email = \Config\Services::email();
+
+                $email->setTo($data['email']);
+                $email->setSubject('Welcome to the System');
+                $email->setMessage('Dear ' . $data['name'] . ',<br><br>Welcome to the system. Your registration number is ' . $data['reg_no'] . '.');
+
+                if (!$email->send()) {
+                    log_message('error', 'Failed to send email to ' . $data['email']);
+                }
+
+                $smsApiUrl = 'https://api.yoursmsprovider.com/send'; 
+                $smsApiKey = 'your_api_key'; 
+                $smsMessage = 'Dear ' . $data['name'] . ', Welcome to the system. Your registration number is ' . $data['reg_no'] . '.';
+
+                $smsData = [
+                    'api_key' => $smsApiKey,
+                    'to' => $data['phone'],
+                    'message' => $smsMessage
+                ];
+
+                $client = \Config\Services::curlrequest();
+                $response = $client->request('POST', $smsApiUrl, [
+                    'form_params' => $smsData
+                ]);
+
+                if ($response->getStatusCode() != 200) {
+                    log_message('error', 'Failed to send SMS to ' . $data['phone']);
+                }
+
+                return $this->response->setJSON([
+                    'status' => 1,
+                    'msg' => 'Student added successfully.',
+                    'token' => csrf_hash()
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 0,
+                    'msg' => 'Failed to add student. Please try again.',
+                    'token' => csrf_hash(),
+                ]);
+            }
+        }
+    } else {
+        return $this->response->setStatusCode(400, 'Bad Request');
+    }
+}
+
+    // public function createStudent()
+    // {
+    //     $request = \Config\Services::request();
+
+    //     if ($request->isAJAX()) {
+    //         $validation = \Config\Services::validation();
+
+    //         $validation->setRules([
+    //             'name' => [
+    //                 'rules' => 'required|string|max_length[255]',
+    //                 'errors' => [
+    //                     'required' => 'Name is required',
+    //                 ]
+    //             ],
+    //             'email' => [
+    //                 'rules' => 'required|valid_email|is_unique[students.email]',
+    //                 'errors' => [
+    //                     'required' => 'Email is required',
+    //                     'valid_email' => 'Please provide a valid email address',
+    //                     'is_unique' => 'This email is already registered',
+    //                 ]
+    //             ],
+    //             'phone' => [
+    //                 'rules' => 'permit_empty|string|max_length[20]',
+    //             ],
+    //             'year_study' => [
+    //                 'rules' => 'required|integer',
+    //                 'errors' => [
+    //                     'required' => 'Year of study is required',
+    //                 ]
+    //             ],
+    //             'semester' => [
+    //                 'rules' => 'required|integer',
+    //                 'errors' => [
+    //                     'required' => 'Semester is required',
+    //                 ]
+    //             ],
+    //             'reg_no' => [
+    //                 'rules' => 'required|string|is_unique[students.reg_no]',
+    //                 'errors' => [
+    //                     'required' => 'Registration number is required',
+    //                     'is_unique' => 'This registration number is already in use',
+    //                 ]
+    //             ]
+    //         ]);
+
+    //         if (!$validation->withRequest($this->request)->run()) {
+    //             $errors = $validation->getErrors();
+    //             return $this->response->setJSON([
+    //                 'status' => 0,
+    //                 'token' => csrf_hash(),
+    //                 'errors' => $errors
+    //             ]);
+    //         } else {
+    //             $studentModel = new Students();
+
+    //             $regNo = $this->request->getPost('reg_no');
+    //             $hashedPassword = password_hash($regNo, PASSWORD_DEFAULT);
+
+    //             $data = [
+    //                 'name' => $this->request->getPost('name'),
+    //                 'email' => $this->request->getPost('email'),
+    //                 'phone' => $this->request->getPost('phone'),
+    //                 'year_study' => $this->request->getPost('year_study'),
+    //                 'semester' => $this->request->getPost('semester'),
+    //                 'reg_no' => $regNo,
+    //                 'password' => $hashedPassword,
+    //                 'usertype' => 'student', 
+    //             ];
+
+    //             if ($studentModel->save($data)) {
+    //                 return $this->response->setJSON([
+    //                     'status' => 1,
+    //                     'msg' => 'Student added successfully.',
+    //                     'token' => csrf_hash()
+    //                 ]);
+    //             } else {
+    //                 return $this->response->setJSON([
+    //                     'status' => 0,
+    //                     'msg' => 'Failed to add student. Please try again.',
+    //                     'token' => csrf_hash(),
+    //                 ]);
+    //             }
+    //         }
+    //     } else {
+    //         return $this->response->setStatusCode(400, 'Bad Request');
+    //     }
+    // }
+    public function editStudent()
+    {
+        $id = $this->request->getGet('id');
+        $studentModel = new Students();
+        $student = $studentModel->find($id);
+    
+        if (!$student) {
+            return $this->response->setJSON(['status' => 0, 'msg' => 'Student not found.']);
+        }
+    
+        return $this->response->setJSON(['status' => 1, 'data' => $student]);
+    }
+    public function updateStudent() {
+        $studentModel = new Students(); 
+        
+        // Retrieve POST data
+        $id = $this->request->getPost('id');
+        $name = $this->request->getPost('name');
+        $email = $this->request->getPost('email');
+        $phone = $this->request->getPost('phone');
+        $yearStudy = $this->request->getPost('year_study');
+        $semester = $this->request->getPost('semester');
+        $regNo = $this->request->getPost('reg_no');
+    
+        // Log received data for debugging
+        log_message('info', "Updating student ID $id with data: Name: $name, Email: $email, Phone: $phone, Year of Study: $yearStudy, Semester: $semester, Reg No: $regNo");
+    
+        $data = [
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'year_study' => $yearStudy,
+            'semester' => $semester,
+            'reg_no' => $regNo
+        ];
+    
+        if ($studentModel->update($id, $data)) {
+            return $this->response->setJSON([
+                'status' => 1,
+                'msg' => 'Student updated successfully.',
+                'token' => csrf_hash()
+            ]);
+        } else {
+            // Log the error
+            log_message('error', "Failed to update student ID $id");
+            return $this->response->setJSON([
+                'status' => 0,
+                'msg' => 'Failed to update student.',
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+    
+
+    public function deleteStudent()
+    {
+        $studentModel = new Students();
+        
+        $id = $this->request->getPost('id');
+        
+        // Validate ID
+        if (empty($id) || !is_numeric($id)) {
+            return $this->response->setJSON([
+                'status' => 0,
+                'msg' => 'Invalid student ID.',
+                'token' => csrf_hash()
+            ]);
+        }
+
+        if ($studentModel->delete($id)) {
+            return $this->response->setJSON([
+                'status' => 1,
+                'msg' => 'Student deleted successfully.',
+                'token' => csrf_hash()
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 0,
+                'msg' => 'Failed to delete student.',
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+    
     public function getUser($id)
     {
         $userModel = new User();
@@ -260,7 +553,6 @@ public function createUser()
         }
     }
     
-
     public function roleName($roleId)
     {
         $roleModel = new Roles();
@@ -270,23 +562,7 @@ public function createUser()
         return $this->response->setJSON(['name' => $roleName]);
     }
 
-    public function addTicket()
-    {
-        $categoryModel = new Categories();
-        $categories = $categoryModel->findAll(); 
-        $data = [
-            'pageTitle' => 'Add Ticket',
-        ];
-        $full_name = CIAuth::fullName();
-
-        $data['full_name'] = $full_name;
-                $data['categories'] = $categories;
-
-        return view('backend/pages/new-ticket', $data);
-    }
-
-    //function to edit a user
-    public function edit()
+       public function edit()
     {
         $userId = $this->request->getGet('id');
         $userModel = new User();
@@ -317,7 +593,7 @@ public function createUser()
     $newData = [
         'full_name' => $this->request->getPost('full_name'),
         'email' => $this->request->getPost('email'),
-        'role' => $this->request->getPost('role_id'),
+        'role_id' => $this->request->getPost('role_id'),
     ];
 
     // Compare old and new data

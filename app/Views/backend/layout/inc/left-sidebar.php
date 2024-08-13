@@ -33,7 +33,7 @@
 
 					<li>
 						<a href="<?= base_url('/admin/get-users') ?>" class="dropdown-toggle no-arrow">
-							<span class="micon dw dw-user"></span><span class="mtext">Users</span>
+							<span class="micon dw dw-user"></span><span class="mtext">Lecturers</span>
 						</a>
 					</li>
 
@@ -43,11 +43,7 @@
 						</a>
 
 					</li>
-					<li>
-						<a href="<?= base_url('/admin/categories/get-categories') ?>" class="dropdown-toggle no-arrow">
-							<span class="micon dw dw-user"></span><span class="mtext">Categories</span>
-						</a>
-					</li>
+					
 					<li>
 						<a href="<?= base_url('admin/logs') ?>" class="dropdown-toggle no-arrow">
 							<span class="micon dw dw-list"></span><span class="mtext">System Logs</span>

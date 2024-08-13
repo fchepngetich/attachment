@@ -40,7 +40,7 @@
                         </div>
                         <div class="col-md-6 profile-item mb-2">
                             <label class="font-weight-bold">Role:</label>
-                            <p class="text-muted"><?= esc(getRoleNameById($user['role'])) ?></p>
+                            <p class="text-muted"><?= esc(getRoleNameById($user['role_id'])) ?></p>
                         </div>
                     </div>
                 </div>

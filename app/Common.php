@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The goal of this file is to allow developers a location
  * where they can overwrite core procedural functions and
@@ -13,3 +12,36 @@
  *
  * @see: https://codeigniter.com/user_guide/extending/common.html
  */
+
+    function getRoleNameById($id)
+    {
+        $roleModel = new \App\Models\Roles();
+        $role = $roleModel->find($id);
+
+        return $role ? $role['name'] : null;
+    }
+
+    function getUsernameById($id)
+    {
+        $userModel = new \App\Models\User();
+        $user = $userModel->find($id);
+
+        return $user ? $user['full_name'] : null;
+    }
+ 
+
+use App\Models\Logs;
+
+if (!function_exists('log_action')) {
+    function log_action($userId, $message)
+    {
+        $logModel = new Logs();
+        $logData = [
+            'user_id' => $userId,
+            'action' => $message,
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+
+        $logModel->insert($logData);
+    }
+}

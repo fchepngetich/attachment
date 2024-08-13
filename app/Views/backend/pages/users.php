@@ -1,12 +1,12 @@
 <div class="container">
 <?= $this->extend('backend/layout/pages-layout') ?>
 <?= $this->section('content') ?>
-
+<div class="container">
 <div class="page-header">
     <div class="row">
         <div class="col-md-6 col-sm-12">
             <div class="title">
-                <h4>Manage Users</h4>
+                <h4>Manage Lecturers</h4>
             </div>
             <nav aria-label="breadcrumb" role="navigation">
                 <ol class="breadcrumb">
@@ -14,14 +14,14 @@
                         <a href="<?= base_url('admin/home') ?>">Home</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Manage Users
+                        Manage Lecturers
                     </li>
                 </ol>
             </nav>
         </div>
         <div class="col-md-6 col-sm-12 text-right">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#user-modal">
-                Add User
+                Add Lecturer
             </button>
         </div>
     </div>
@@ -49,7 +49,7 @@
             <td><?= $user['email'] ?></td>
             <td>
                 <?php
-                $roleId = $user['role'];
+                $roleId = $user['role_id'];
                 $roleName = '';
                 foreach ($roles as $role) {
                     if ($role['id'] == $roleId) {
@@ -81,7 +81,7 @@
 <?php include 'modals/create-user-modal.php'?>
 <?php include 'modals/edit-user-modal.php'?>
 
-</div>
+</div></div>
 
 <?= $this->endSection() ?>
 

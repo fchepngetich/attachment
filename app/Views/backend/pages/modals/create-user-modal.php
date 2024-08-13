@@ -4,7 +4,7 @@
         <form class="modal-content" action="<?= base_url('admin/create-user') ?>" id="add-user-form" method="post">
             <div class="modal-header">
                 <h4 class="modal-title" id="myLargeModalLabel">
-                    Add User
+                    Add Lecturer
                 </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                     &times;
@@ -26,7 +26,7 @@
                 </div>
                 <div class="form-group">
                     <label for="role"><b>Role</b></label>
-                    <select name="role" class="form-control" required>
+                    <select name="role_id" class="form-control" required>
                         <option value="">Select Role</option>
                         <?php foreach ($roles as $role): ?>
                             <option value="<?= $role['id'] ?>"><?= $role['name'] ?></option>

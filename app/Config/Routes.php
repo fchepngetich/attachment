@@ -11,8 +11,17 @@ $routes->group('admin', static function ($routes) {
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
         $routes->get('home', 'StudentsController::index', ['as' => 'admin.home']);
         $routes->get('logout', 'AdminController::logoutHandler');
-
-       
+        $routes->post('get-users', 'AdminController::getUser', ['as' => 'admin.users.get']);
+        $routes->get('get-users', 'AdminController::getUsers', ['as' => 'get-users']);
+        $routes->get('user/edit', 'AdminController::edit', ['as' => 'user.edit']);
+        $routes->post('user/update', 'AdminController::update', ['as' => 'user.update']);
+        $routes->post('user/delete', 'AdminController::delete', ['as' => 'user.delete']);
+        $routes->get('profile', 'AdminController::profile', ['as' => 'profile']);
+        $routes->get('logs', 'LogsController::index');
+         $routes->get('change-password', 'AdminController::changePassword', ['as' => 'change_password']);
+        $routes->post('change-password', 'AdminController::updatePassword');  
+        $routes->get('new-user', 'AdminController::addUser', ['as' => 'new-user']);
+        $routes->post('create-user', 'AdminController::createUser', ['as' => 'create-user']);
     });
     $routes->group('students', ['filter' => 'cifilter:auth'], static function ($routes) {
         $routes->get('attachment/create', 'StudentsController::create', ['as' => 'attachment.create']);
@@ -21,6 +30,10 @@ $routes->group('admin', static function ($routes) {
         // $routes->get('assign-supervisor/(:num)', 'StudentController::assignSupervisor/$1');
         // $routes->post('assign-supervisor/save', 'StudentController::saveAssignment');
         $routes->get('confirm-assessment/(:num)', 'StudentsController::confirmAssessmentByStudent/$1');
+        $routes->post('create-student', 'AdminController::createStudent');
+        $routes->get('edit', 'AdminController::editStudent');
+        $routes->post('delete', 'AdminController::deleteStudent');
+        $routes->post('update-student', 'AdminController::updateStudent');
 
     });
 
