@@ -1,34 +1,20 @@
 <?= $this->extend('backend/layout/pages-layout') ?>
 <?= $this->section('content') ?>
 
-<div class="container">
+
+
+    <div class="container">
     <div class="page-header">
-        <div class="row">
-            <div class="col-md-6 col-sm-12">
                 <div class="title">
                     <h4>Attached Students</h4>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url('admin/home') ?>">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                           Attached Students
-                        </li>
-                    </ol>
-                </nav>
-            </div>
-            
         </div>
-    </div>
-
-    <div class="container mt-5">
         <?php if (session()->getFlashdata('message')): ?>
             <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
         <?php endif; ?>
-
-        <table id="attachmentsTable" class="table table-striped">
+        <div class="card card-box">
+        <div class="card-body">
+        <table id="attachmentsTable" class="table table-sm table-hover table-striped table-borderless">
             <thead>
                 <tr>
                     <th>Student</th>
@@ -68,7 +54,7 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
+    </div> </div> </div>
 </div>
 
 <?= $this->section('stylesheets')?>
@@ -90,13 +76,7 @@
 <script>
     $(document).ready(function() {
         $('#attachmentsTable').DataTable({
-            "paging": true,
-            "lengthChange": true,
-            "searching": true,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
+            
         });
     });
 </script>

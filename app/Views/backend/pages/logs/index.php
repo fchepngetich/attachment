@@ -7,21 +7,14 @@
             <div class="title">
                 <h4>System Logs</h4>
             </div>
-            <nav aria-label="breadcrumb" role="navigation">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="<?= base_url('admin/home') ?>">Home</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        View Logs
-                    </li>
-                </ol>
-            </nav>
-        </div>
-    <table class="table table-striped">
+          
+        </div>   
+         </div></div>
+         <div class="card card-box">
+        <div class="card-body">
+    <table class="table table-sm table-hover table-striped table-borderless">
         <thead>
         <?php if (!empty($logs) && is_array($logs)): ?>
-
             <tr>
                 <th>#</th>
                 <th>User</th>
@@ -45,6 +38,6 @@
             <?php endif; ?>
         </tbody>
     </table>
-</div>
+</div></div></div>
 
 <?= $this->endSection() ?>

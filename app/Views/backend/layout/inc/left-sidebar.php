@@ -12,13 +12,14 @@
 	<div class="menu-block customscroll">
 		<div class="sidebar-menu">
 			<ul id="accordion-menu">
-				<li>
+				
+					<?php if (App\Libraries\CIAuth::userType() === 'lecturer'): ?>
+						<li>
 					<a href="<?= base_url('admin/home') ?>" class="dropdown-toggle no-arrow">
 						<span class="micon dw dw-home"></span><span class="mtext">Students List</span>
 					</a>
 				</li>
-				<li>
-					<?php if (App\Libraries\CIAuth::userType() === 'lecturer'): ?>
+				<li></li>
 						<li>
 						<a href="<?= base_url('/admin/attachment/get') ?>" class="dropdown-toggle no-arrow">
 						<span class="micon dw dw-user"></span><span class="mtext">Attached Students</span>
@@ -53,6 +54,11 @@
 				<?php endif ?>
 				<?php if (App\Libraries\CIAuth::userType() === 'student'): ?>
 					<li>
+						<a href="<?= base_url('/admin/attachmentlist') ?>" class="dropdown-toggle no-arrow">
+						<span class="micon dw dw-user"></span><span class="mtext">Attachment List</span>
+					</a>
+					</li>
+					<li>
 						<a href="<?= base_url('/admin/students/attachment/create') ?>" class="dropdown-toggle no-arrow">
 						<span class="micon dw dw-user"></span><span class="mtext">Add Attachment Details</span>
 					</a>
@@ -62,6 +68,7 @@
 						<span class="micon dw dw-user"></span><span class="mtext">My attachment Details</span>
 					</a>
 					</li>
+
 				<?php endif ?>
 
 				<div class="dropdown-divider"></div>
@@ -69,6 +76,19 @@
 				<li>
 					<div class="sidebar-small-cap">Settings</div>
 				</li>
+				
+				<?php if (App\Libraries\CIAuth::userType() === 'student'): ?>
+					<li>
+					<a href="<?= base_url('/admin/studentsprofile') ?>" class="dropdown-toggle no-arrow">
+						<span class="micon dw dw-user"></span>
+						<span class="mtext">My Profile
+						</span>
+					</a>
+
+				</li>
+					<?php endif ?>
+					<?php if (App\Libraries\CIAuth::userType() === 'lecturer'): ?>
+
 				<li>
 					<a href="<?= base_url('/admin/profile') ?>" class="dropdown-toggle no-arrow">
 						<span class="micon dw dw-user"></span>
@@ -77,6 +97,7 @@
 					</a>
 
 				</li>
+				<?php endif ?>
 
 			</ul>
 		</div>

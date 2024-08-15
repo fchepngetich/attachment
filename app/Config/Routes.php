@@ -10,6 +10,7 @@ $routes->get('/', 'Home::index');
 $routes->group('admin', static function ($routes) {
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
         $routes->get('home', 'StudentsController::index', ['as' => 'admin.home']);
+        $routes->get('attachmentlist', 'StudentsController::studentsHome');
         $routes->get('logout', 'AdminController::logoutHandler');
         $routes->post('get-users', 'AdminController::getUser', ['as' => 'admin.users.get']);
         $routes->get('get-users', 'AdminController::getUsers', ['as' => 'get-users']);
@@ -17,6 +18,7 @@ $routes->group('admin', static function ($routes) {
         $routes->post('user/update', 'AdminController::update', ['as' => 'user.update']);
         $routes->post('user/delete', 'AdminController::delete', ['as' => 'user.delete']);
         $routes->get('profile', 'AdminController::profile', ['as' => 'profile']);
+        $routes->get('studentsprofile', 'AdminController::studentsProfile', ['as' => 'studentsprofile']);
         $routes->get('logs', 'LogsController::index');
          $routes->get('change-password', 'AdminController::changePassword', ['as' => 'change_password']);
         $routes->post('change-password', 'AdminController::updatePassword');  
@@ -44,6 +46,8 @@ $routes->group('admin', static function ($routes) {
         $routes->get('change-supervisor/(:num)', 'AttachmentController::changeSupervisor/$1');
         $routes->post('save-supervisor-change', 'AttachmentController::saveSupervisorChange');
         $routes->get('attachment-details', 'AttachmentController::viewAttachmentDetails');
+        $routes->get('edit-attachment/(:num)', 'AttachmentController::editAttachment/$1');
+        $routes->post('update-attachment', 'AttachmentController::updateAttachment');
         $routes->get('my-students', 'AttachmentController::students');
         $routes->get('assessment-form/(:num)', 'AttachmentController::assessmentForm/$1');
         $routes->post('confirm-assessment', 'AttachmentController::confirmAssessment');

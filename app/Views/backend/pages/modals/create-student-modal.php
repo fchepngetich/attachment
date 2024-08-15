@@ -1,7 +1,9 @@
 <!-- Modal to Add Student -->
-<div class="modal fade" id="student-modal" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel" aria-hidden="true" style="display: none;" data-backdrop="static">
+<div class="modal fade" id="student-modal" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel"
+    aria-hidden="true" style="display: none;" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
-        <form class="modal-content" action="<?= base_url('admin/students/create-student') ?>" id="add-student-form" method="post">
+        <form class="modal-content" action="<?= base_url('admin/students/create-student') ?>" id="add-student-form"
+            method="post">
             <div class="modal-header">
                 <h4 class="modal-title" id="studentModalLabel">
                     Add Student
@@ -56,8 +58,30 @@
 
                 <div class="form-group">
                     <label for="reg_no"><b>Registration Number</b></label>
-                    <input type="text" name="reg_no" class="form-control" required placeholder="Enter registration number">
+                    <input type="text" name="reg_no" class="form-control" required
+                        placeholder="Enter registration number">
                     <span class="alert error reg_no_error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="school"><b>School</b></label>
+                    <select name="school" class="form-control" required>
+                        <option value="">Select School</option>
+                        <option value="1">School of Engineering</option>
+                        <option value="2">School of Business</option>
+                        <option value="3">School of Medicine</option>
+                        <option value="4">School of Arts and Humanities</option>
+                        <option value="5">School of Education</option>
+                    </select>
+                    <span class="alert error school_error"></span>
+                </div>
+
+
+                <!-- Course Field -->
+                <div class="form-group">
+                    <label for="course"><b>Course</b></label>
+                    <input type="text" name="course" class="form-control" required placeholder="Enter course name">
+                    <span class="alert error course_error"></span>
                 </div>
             </div>
             <div class="modal-footer">

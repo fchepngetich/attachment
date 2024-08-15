@@ -61,6 +61,32 @@
                     <input type="text" id="edit-reg_no" name="reg_no" class="form-control" required placeholder="Enter registration number">
                     <span class="alert error reg_no_error"></span>
                 </div>
+
+                <div class="form-group">
+                    <label for="edit-school"><b>School</b></label>
+                    <select id="edit-school" name="school" class="form-control" required>
+                        <option value="">Select School</option>
+                        <option value="1">School of Engineering</option>
+                        <option value="2">School of Business</option>
+                        <option value="3">School of Medicine</option>
+                        <option value="4">School of Arts and Humanities</option>
+                        <option value="5">School of Education</option>
+                    </select>
+                    <span class="alert error school_error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-course"><b>Course</b></label>
+                    <select id="edit-course" name="course" class="form-control" required>
+                        <option value="">Select Course</option>
+                        <option value="1">Computer Science</option>
+                        <option value="2">Business Administration</option>
+                        <option value="3">Medicine</option>
+                        <option value="4">Fine Arts</option>
+                        <option value="5">Education</option>
+                    </select>
+                    <span class="alert error course_error"></span>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">

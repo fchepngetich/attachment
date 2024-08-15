@@ -21,13 +21,21 @@
                         </span>-->
                     <span class="user-name mr-1"><?= esc($full_name) ?></span>
                 </a>
-
-
                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                <?php if (App\Libraries\CIAuth::userType() === 'lecturer'): ?>
+
                     <a class="dropdown-item" href="<?= base_url('/admin/profile') ?>"><i class="dw dw-user"></i>
                         Profile</a>
+
                     <a class="dropdown-item" href="<?= base_url('/admin/change-password') ?>"><i class="dw dw-settings"></i>
                         Change Password</a>
+                        <?php endif ?>
+                        <?php if (App\Libraries\CIAuth::userType() === 'student'): ?>
+
+                    <a class="dropdown-item" href="<?= base_url('/admin/studentsprofile') ?>"><i class="dw dw-user"></i>
+                        My Profile</a>
+                         <?php endif ?>
+
                     <a class="dropdown-item" href="<?= base_url('admin/logout') ?>"><i class="dw dw-logout"></i> Log
                         Out</a>
                 </div>

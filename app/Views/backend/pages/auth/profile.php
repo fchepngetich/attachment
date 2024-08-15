@@ -8,26 +8,13 @@
         <div class="title">
             <h4>My Profile</h4>
         </div>
-        <nav aria-label="breadcrumb" role="navigation">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="<?= base_url('admin/home')?>">Home</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    View Profile
-                </li>
-            </ol>
-        </nav>
     </div>
-   
 </div>
 </div>
 
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="profile-box bg-white box-shadow border-radius-10 p-4">
-               
-                
                 <div class="profile-content">
                     <div class="row">
                         <div class="col-md-6 profile-item mb-2">

@@ -8,16 +8,7 @@
             <div class="title">
                 <h4>Manage Lecturers</h4>
             </div>
-            <nav aria-label="breadcrumb" role="navigation">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="<?= base_url('admin/home') ?>">Home</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        Manage Lecturers
-                    </li>
-                </ol>
-            </nav>
+
         </div>
         <div class="col-md-6 col-sm-12 text-right">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#user-modal">
@@ -106,6 +97,8 @@ $(document).ready(function() {
         var modal = $('#user-modal');
         var formData = new FormData(form);
         formData.append(csrfName, csrfHash);
+
+        console.log(formData);
 
         $.ajax({
             url: $(form).attr('action'),

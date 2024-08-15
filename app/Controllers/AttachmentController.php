@@ -75,6 +75,96 @@ class AttachmentController extends BaseController
         return view('backend/pages/students/attachment-details', $data);
     }
     
+    public function editAttachment($id)
+{
+    $attachmentModel = new Attachment();
+    $attachmentDetails = $attachmentModel->find($id);
+    $full_name = CIAuth::StudentName();
+
+    if (!$attachmentDetails) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException('Attachment not found');
+    }
+
+    $data = [
+        'full_name' => $full_name,
+        'attachmentDetails' => $attachmentDetails,
+        'counties' => [
+            'BARINGO'         => 'Baringo County',
+            'BOMET'           => 'Bomet County',
+            'BUNGOMA'         => 'Bungoma County',
+            'BUSIA'           => 'Busia County',
+            'ELGEYO-MARAKWET' => 'Elgeyo-Marakwet County',
+            'EMBU'            => 'Embu County',
+            'GARISSA'         => 'Garissa County',
+            'HOMA-BAY'        => 'Homa-bay County',
+            'ISIOLO'          => 'Isiolo County',
+            'KAJIADO'         => 'Kajiado County',
+            'KAKAMEGA'        => 'Kakamega County',
+            'KERICHO'         => 'Kericho County',
+            'KIAMBU'          => 'Kiambu County',
+            'KILIFI'          => 'Kilifi County',
+            'KIRINYAGA'       => 'Kirinyaga County',
+            'KISII'           => 'Kisii County',
+            'KISUMU'          => 'Kisumu County',
+            'KITUI'           => 'Kitui County',
+            'KWALE'           => 'Kwale County',
+            'LAIKIPIA'        => 'Laikipia County',
+            'LAMU'            => 'Lamu County',
+            'MACHAKOS'        => 'Machakos County',
+            'MAKUENI'         => 'Makueni County',
+            'MANDERA'         => 'Mandera County',
+            'MARSABIT'        => 'Marsabit County',
+            'MERU'            => 'Meru County',
+            'MIGORI'          => 'Migori County',
+            'MOMBASA'         => 'Mombasa County',
+            'MURANGA'         => 'Muranga County',
+            'NAIROBI'         => 'Nairobi County',
+            'NAKURU'          => 'Nakuru County',
+            'NANDI'           => 'Nandi County',
+            'NAROK'           => 'Narok County',
+            'NYAMIRA'         => 'Nyamira County',
+            'NYANDARUA'       => 'Nyandarua County',
+            'NYERI'           => 'Nyeri County',
+            'SAMBURU'         => 'Samburu County',
+            'SIAYA'           => 'Siaya County',
+            'TAITA-TAVETA'    => 'Taita-Taveta County',
+            'TANA RIVER'      => 'Tana River County',
+            'THARAKA-NITHI'   => 'Tharaka-Nithi County',
+            'TRANS-NZOIA'     => 'Trans-Nzoia County',
+            'TURKANA'         => 'Turkana County',
+            'UASIN GISHU'     => 'Uasin Gishu County',
+            'VIHIGA'          => 'Vihiga County',
+            'WAJIR'           => 'Wajir County',
+            'WEST POKOT'      => 'West Pokot County',
+        ],
+    ];
+
+    return view('backend/pages/students/edit-attachment', $data);
+}
+
+public function updateAttachment()
+{
+    $attachmentModel = new Attachment();
+    $id = $this->request->getPost('id');
+
+    $data = [
+        'company_name' => $this->request->getPost('company_name'),
+        'county' => $this->request->getPost('county'),
+        'company_location' => $this->request->getPost('company_location'),
+        'company_email' => $this->request->getPost('company_email'),
+        'company_phone' => $this->request->getPost('company_phone'),
+        'date_start' => $this->request->getPost('date_start'),
+        'date_end' => $this->request->getPost('date_end'),
+        'google_map' => $this->request->getPost('google_map'),
+    ];
+
+    if ($attachmentModel->update($id, $data)) {
+        return redirect()->to('admin/attachment/attachment-details')->with('success', 'Attachment details updated successfully.');
+    } else {
+        return redirect()->back()->with('fail', 'Failed to update attachment details.');
+    }
+}
+
 
     public function assignSupervisor($attachmentId)
     {

@@ -54,7 +54,8 @@ class AuthController extends BaseController
             $isStudent = false;
     
             $userInfo = $studentModel->where($fieldType, $loginId)->first();
-    
+            log_message('info', 'User info: ' . json_encode($userInfo));
+
             if ($userInfo) {
                 $isStudent = true; 
             } else {
@@ -76,7 +77,7 @@ class AuthController extends BaseController
                 }
     
                 if ($isStudent) {
-                    return redirect()->to(base_url('admin/students/attachment/create'));
+                    return redirect()->to(base_url('admin/attachmentlist'));
                 } else {
                     return redirect()->to(base_url('admin/home'));
                 }
@@ -280,8 +281,6 @@ class AuthController extends BaseController
     }
 }
 
-
-
     public function changePassword()
     {
         $data = array(
@@ -298,6 +297,3 @@ class AuthController extends BaseController
 
    
 }
-
-
-

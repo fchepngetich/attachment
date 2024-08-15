@@ -8,16 +8,7 @@
                 <div class="title">
                     <h4>Change Supervisor for Student Attachment</h4>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url('admin/home') ?>">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Change Supervisor
-                        </li>
-                    </ol>
-                </nav>
+              
             </div>
         </div>
     </div>

@@ -7,16 +7,7 @@
                 <div class="title">
                     <h4>Add Attachment Details</h4>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url('admin/home') ?>">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Add Attachment Details
-                        </li>
-                    </ol>
-                </nav>
+                
             </div>
         </div>
     </div>
@@ -81,8 +72,8 @@
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-sm btn-primary">Submit</button>
-        <a href="<?= base_url('admin/home') ?>" class="btn btn-sm btn-secondary ml-2">Cancel</a>
-    </div>
+        <a href="javascript:history.back()" class="btn btn-sm btn-secondary ml-2">Cancel</a>
+        </div>
 </form>
 
 </div>

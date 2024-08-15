@@ -7,16 +7,7 @@
                 <div class="title">
                     <h4>Manage Roles</h4>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url('admin/home') ?>">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Manage Roles
-                        </li>
-                    </ol>
-                </nav>
+           
             </div>
             <div class="col-md-6 col-sm-12 text-right">
                 <button type="button" id="btn-add-role" class="btn btn-primary btn-sm">

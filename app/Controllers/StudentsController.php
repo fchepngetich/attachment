@@ -21,14 +21,32 @@ class StudentsController extends BaseController
         require_once APPPATH . 'ThirdParty/ssp.php';
         $this->db = db_connect();
     }
-    public function index()
+//     public function index()
+// {
+//     $full_name = CIAuth::fullName(); 
+//     $studentsModel = new Students();
+//     $usersModel = new User(); 
+
+//     $students = $studentsModel->findAll();
+
+//     $data = [
+//         'full_name' => $full_name,
+//         'students' => $students,
+//     ];
+
+//     return view('backend/pages/home', $data);
+// }
+
+public function index()
 {
     $userId = CIAuth::id();
     $userType = CIAuth::userType(); 
-
-    // Initialize models
     $studentsModel = new Students();
     $usersModel = new User(); 
+ 
+    // Debug output
+    log_message('info', "User ID: $userId");
+    log_message('info', "User Type: $userType");
 
     if ($userType === 'student') {
         $student = $studentsModel->where('id', $userId)->first(); 
@@ -36,6 +54,11 @@ class StudentsController extends BaseController
     } elseif ($userType === 'user') {
         $user = $usersModel->find($userId);
         $full_name = $user['full_name'] ?? 'Unknown User';
+    } elseif ($userType === 'lecturer') {
+        
+        $lecturerModel = new User(); 
+        $lecturer = $lecturerModel->find($userId);
+        $full_name = $lecturer['full_name'] ?? 'Unknown Lecturer';
     } else {
         $full_name = 'Guest';
     }
@@ -50,6 +73,21 @@ class StudentsController extends BaseController
     return view('backend/pages/home', $data);
 }
 
+public function studentsHome()
+{
+    $full_name = CIAuth::StudentName(); 
+    $studentsModel = new Students();
+    $usersModel = new User(); 
+
+    $students = $studentsModel->findAll();
+
+    $data = [
+        'full_name' => $full_name,
+        'students' => $students,
+    ];
+
+    return view('backend/pages/studentshome', $data);
+}
    
         public function create()
         {

@@ -7,16 +7,7 @@
                 <div class="title">
                     <h4>My Attachment Details</h4>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url('admin/home') ?>">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            My Attachment Details
-                        </li>
-                    </ol>
-                </nav>
+            
             </div>
         </div>
     </div>
@@ -129,6 +120,10 @@
 
         <div class="form-group mb-3">
             <a href="<?= base_url('admin/home') ?>" class="btn btn-sm btn-secondary">Back</a>
+            <span><a href="<?= base_url('admin/attachment/edit-attachment/' . esc($attachmentDetails['id'])) ?>" class="btn btn-sm btn-warning">Edit Details</a>
+            </span>
         </div>
+        
+      
     </div>
 <?= $this->endSection() ?>

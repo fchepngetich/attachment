@@ -8,16 +8,7 @@
                 <div class="title">
                     <h4>My Students</h4>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url('admin/home') ?>">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                           My Students
-                        </li>
-                    </ol>
-                </nav>
+                
             </div>
         </div>
     </div>
@@ -26,8 +17,9 @@
         <?php if (session()->getFlashdata('message')): ?>
             <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
         <?php endif; ?>
-    
-    <table id="studentsTable" class="table table-striped table-bordered">
+        <div class="card card-box">
+        <div class="card-body">
+    <table id="studentsTable" class="table table-sm table-hover table-striped table-borderless">
         <thead>
             <tr>
                 <th>#</th>
@@ -61,7 +53,7 @@
             <?php endforeach; ?>
         </tbody>
     </table>
-</div>
+</div></div></div>
 
 <?= $this->section('stylesheets')?>
 <link rel="stylesheet" href="/backend/src/plugins/datatables/css/dataTables.bootstrap4.min.css">

@@ -6,18 +6,9 @@
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <div class="title">
-                        <h4>Manage Students</h4>
+                        <h5>Manage Students</h5>
                     </div>
-                    <nav aria-label="breadcrumb" role="navigation">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="<?= base_url('admin/home') ?>">Home</a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                Manage Students
-                            </li>
-                        </ol>
-                    </nav>
+              
                 </div>
                 <div class="col-md-6 col-sm-12 text-right">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#student-modal">
@@ -34,20 +25,18 @@
                         <table class="table table-sm table-hover table-striped table-borderless" id="students-table">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Phone</th>
-                                    <th scope="col">Year of Study</th>
+                                    <th scope="col">Year</th>
                                     <th scope="col">Semester</th>
-                                    <th scope="col">Registration Number</th>
+                                    <th scope="col">Reg No</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $count = 1; foreach ($students as $student): ?>
+                                <?php foreach ($students as $student): ?>
                                 <tr>
-                                    <td><?= $count++ ?></td>
                                     <td><?= $student['name'] ?></td>
                                     <td><?= $student['email'] ?></td>
                                     <td><?= $student['phone'] ?></td>
@@ -137,7 +126,7 @@ $(document).ready(function() {
         });
     });
 
-    // Load student data into the modal
+    $(document).ready(function() {
     $('.edit-student-btn').on('click', function() {
         var studentId = $(this).data('id');
         $.ajax({
@@ -167,59 +156,52 @@ $(document).ready(function() {
         });
     });
 
-    $('#add-student-form').on('submit', function(e) {
-    e.preventDefault();
-    var csrfName = $('.ci_csrf_data').attr('name');
-    var csrfHash = $('.ci_csrf_data').val();
-    var form = this;
-    var modal = $('#student-modal');
-    var formData = new FormData(form);
-    formData.append(csrfName, csrfHash);
+    $('#edit-student-form').on('submit', function(e) {
+        e.preventDefault();
 
-    // Debugging: Log FormData contents
-    console.log('FormData contents:');
-    formData.forEach(function(value, key) {
-        console.log(key + ': ' + value);
-    });
+        var form = this;
+        var formData = new FormData(form);
 
-    $.ajax({
-        url: $(form).attr('action'),
-        method: $(form).attr('method'),
-        data: formData,
-        processData: false,
-        dataType: 'json',
-        contentType: false,
-        cache: false,
-        beforeSend: function() {
-            toastr.remove();
-            $(form).find('span.error-text').text('');
-        },
-        success: function(response) {
-            if (response.token) {
-                $('.ci_csrf_data').val(response.token);
-            }
-            if (response.status === 1) {
-                $(form)[0].reset();
-                modal.modal('hide');
-                toastr.success(response.msg);
-                location.reload(); 
-            } else if (response.status === 0) {
-                if (response.errors) {
-                    $.each(response.errors, function(prefix, val) {
-                        $(form).find('span.' + prefix + '_error').text(val);
-                    });
-                } else {
-                    toastr.error(response.msg);
+        $.ajax({
+            url: $(form).attr('action'),
+            method: $(form).attr('method'),
+            data: formData,
+            processData: false,
+            dataType: 'json',
+            contentType: false,
+            cache: false,
+            beforeSend: function() {
+                toastr.remove();
+                $(form).find('span.error-text').text('');
+            },
+            success: function(response) {
+                if (response.token) {
+                    $('input[name="<?= csrf_token() ?>"]').val(response.token); 
                 }
+                if (response.status === 1) {
+                    $(form)[0].reset();
+                    $('#edit-student-modal').modal('hide');
+                    toastr.success(response.msg);
+                    location.reload();
+                } else if (response.status === 0) {
+                    toastr.error(response.msg);
+                } else {
+                    if (response.errors) {
+                        $.each(response.errors, function(prefix, val) {
+                            $(form).find('span.' + prefix + '_error').text(val);
+                        });
+                    } else {
+                        toastr.error('An unexpected error occurred.');
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed:", xhr, status, error);
+                toastr.error('An error occurred. Please try again.');
             }
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX request failed:", xhr, status, error);
-            toastr.error('An error occurred. Please try again.');
-        }
+        });
     });
 });
-
 
     // Delete Student
     $('.delete-student-btn').on('click', function() {
@@ -243,6 +225,8 @@ $(document).ready(function() {
                     },
                     dataType: 'json',
                     success: function(response) {
+                        console.log('AJAX Response:', response); 
+
                         if (response.token) {
                             $('.ci_csrf_data').val(response.token);
                         }
