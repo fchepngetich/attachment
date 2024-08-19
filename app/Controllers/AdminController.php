@@ -8,6 +8,8 @@ use App\Libraries\CIAuth;
 use App\Models\User;
 use App\Models\Roles;
 use App\Models\Students;
+use App\Models\School;
+
 
 
 use \Mberecall\CI_Slugify\SlugService;
@@ -41,7 +43,6 @@ class AdminController extends BaseController
         $students = new Students();
 
         $data = ['full_name' => $full_name];
-
         return view('backend/pages/home', $data);
     }
 
@@ -231,7 +232,8 @@ class AdminController extends BaseController
     public function createStudent()
     {
         $request = \Config\Services::request();
-        
+        $schoolModel = new School();  
+    $data['schools'] = $schoolModel->findAll();
         if ($request->isAJAX()) {
             $validation = \Config\Services::validation();
 
@@ -508,8 +510,6 @@ class AdminController extends BaseController
         }
     }
     
-    
-
     public function deleteStudent()
     {
         $studentModel = new Students();
@@ -791,6 +791,99 @@ class AdminController extends BaseController
             'full_name' => $full_name
         ]);
     }
+
+    public function uploadUsers()
+    {
+        $validation = \Config\Services::validation();
+    
+        $validation->setRules([
+            'user_file' => [
+                'label' => 'File',
+                'rules' => 'uploaded[user_file]|mime_in[user_file,text/csv,text/plain]|max_size[user_file,1024]',
+            ],
+        ]);
+    
+        if (!$this->validate($validation->getRules())) {
+            // Log validation errors and return to the previous page with errors
+            log_message('error', 'Validation failed: ' . json_encode($validation->getErrors()));
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+    
+        $file = $this->request->getFile('user_file');
+    
+        if ($file->isValid() && !$file->hasMoved()) {
+            $filePath = $file->getTempName();
+            // Parse the CSV file
+            $users = $this->parseCSVFile($filePath);
+    
+            if (empty($users)) {
+                log_message('error', 'No users found in the CSV file.');
+                return redirect()->back()->with('error', 'No users found in the CSV file.');
+            }
+    
+            $userModel = new User();
+            $roleModel = new Roles();
+    
+            foreach ($users as $user) {
+                $role = $roleModel->where('name', $user['role'])->first();
+                if ($role) {
+                    // Check if the user already exists
+                    $existingUser = $userModel->where('email', $user['email'])->first();
+                    if (!$existingUser) {
+                        // Insert the user if not already present
+                        $userModel->insert([
+                            'full_name' => $user['full_name'],
+                            'email' => $user['email'],
+                            'role_id' => $role['id'],
+                            // Add other necessary fields
+                        ]);
+                    } else {
+                        // Log or handle the duplicate case as needed
+                        log_message('info', 'User already exists, skipping: ' . $user['email']);
+                    }
+                } else {
+                    log_message('error', 'Role not found: ' . $user['role']);
+                }
+            }
+    
+            return redirect()->back()->with('success', 'Users uploaded successfully.');
+        } else {
+            log_message('error', 'File upload failed or file has already been moved.');
+            return redirect()->back()->with('error', 'Failed to upload the file.');
+        }
+    }
+    
+    
+
+    private function parseCSVFile($filePath)
+    {
+        $users = [];
+    
+        if (($handle = fopen($filePath, 'r')) !== FALSE) {
+            // Skip the first row if it contains headers
+            $headers = fgetcsv($handle);
+    
+            while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                if (count($data) >= 3) { // Ensure there are at least 3 columns
+                    $users[] = [
+                        'full_name' => $data[0],
+                        'email' => $data[1],
+                        'role' => $data[2],
+                        // Add additional fields as necessary
+                    ];
+                } else {
+                    log_message('error', 'Invalid CSV row: ' . implode(',', $data));
+                }
+            }
+            fclose($handle);
+        } else {
+            log_message('error', 'Unable to open file: ' . $filePath);
+        }
+    
+        return $users;
+    }
+    
+
 
 
 }

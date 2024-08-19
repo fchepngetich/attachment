@@ -20,15 +20,17 @@ $routes->group('admin', static function ($routes) {
         $routes->get('profile', 'AdminController::profile', ['as' => 'profile']);
         $routes->get('studentsprofile', 'AdminController::studentsProfile', ['as' => 'studentsprofile']);
         $routes->get('logs', 'LogsController::index');
-         $routes->get('change-password', 'AdminController::changePassword', ['as' => 'change_password']);
-        $routes->post('change-password', 'AdminController::updatePassword');  
+        $routes->get('change-password', 'AdminController::changePassword', ['as' => 'change_password']);
+        $routes->post('change-password', 'AdminController::updatePassword');
         $routes->get('new-user', 'AdminController::addUser', ['as' => 'new-user']);
         $routes->post('create-user', 'AdminController::createUser', ['as' => 'create-user']);
+        $routes->post('upload-users', 'AdminController::uploadUsers');
+
     });
     $routes->group('students', ['filter' => 'cifilter:auth'], static function ($routes) {
         $routes->get('attachment/create', 'StudentsController::create', ['as' => 'attachment.create']);
         $routes->post('attachment/store', 'StudentsController::store', ['as' => 'attachment.store']);
-         $routes->get('get', 'StudentController::index');
+        $routes->get('get', 'StudentController::index');
         // $routes->get('assign-supervisor/(:num)', 'StudentController::assignSupervisor/$1');
         // $routes->post('assign-supervisor/save', 'StudentController::saveAssignment');
         $routes->get('confirm-assessment/(:num)', 'StudentsController::confirmAssessmentByStudent/$1');
@@ -38,11 +40,29 @@ $routes->group('admin', static function ($routes) {
         $routes->post('update-student', 'AdminController::updateStudent');
 
     });
+    $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
+
+        $routes->get('school', 'SchoolController::index');
+        $routes->get('school/create', 'SchoolController::create');
+        $routes->post('school/store', 'SchoolController::store');
+        $routes->post('school/edit', 'SchoolController::edit');
+        $routes->post('school/update', 'SchoolController::update');
+        $routes->delete('school/delete/(:num)', 'SchoolController::delete/$1');
+    });
+
+    $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
+        $routes->get('courses', 'CourseController::index');
+        $routes->post('courses/create', 'CourseController::create');
+        $routes->post('courses/edit', 'CourseController::edit');
+        $routes->post('courses/update', 'CourseController::update');
+        $routes->delete('courses/delete/(:num)', 'CourseController::delete/$1');
+    });
+    
 
     $routes->group('attachment', ['filter' => 'cifilter:auth'], static function ($routes) {
         $routes->get('get', 'AttachmentController::index');
-       $routes->get('assign-supervisor/(:num)', 'AttachmentController::assignSupervisor/$1');
-       $routes->post('assign-supervisor/save', 'AttachmentController::saveAssignment');
+        $routes->get('assign-supervisor/(:num)', 'AttachmentController::assignSupervisor/$1');
+        $routes->post('assign-supervisor/save', 'AttachmentController::saveAssignment');
         $routes->get('change-supervisor/(:num)', 'AttachmentController::changeSupervisor/$1');
         $routes->post('save-supervisor-change', 'AttachmentController::saveSupervisorChange');
         $routes->get('attachment-details', 'AttachmentController::viewAttachmentDetails');
@@ -52,7 +72,7 @@ $routes->group('admin', static function ($routes) {
         $routes->get('assessment-form/(:num)', 'AttachmentController::assessmentForm/$1');
         $routes->post('confirm-assessment', 'AttachmentController::confirmAssessment');
 
-   });
+    });
 
     $routes->group('roles', ['filter' => 'cifilter:auth'], function ($routes) {
         $routes->get('/', 'RolesController::index');
@@ -61,8 +81,8 @@ $routes->group('admin', static function ($routes) {
         $routes->post('update/(:num)', 'RolesController::update/$1');
         $routes->get('delete/(:num)', 'RolesController::delete/$1');
     });
-    
-  
+
+
     $routes->group('', ['filter' => 'cifilter:guest'], static function ($routes) {
         //$routes->view('example-auth','example-auth');
         $routes->get('login', 'AuthController::loginForm', ['as' => 'admin.login.form']);

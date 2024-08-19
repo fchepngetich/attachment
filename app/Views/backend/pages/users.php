@@ -10,11 +10,16 @@
             </div>
 
         </div>
-        <div class="col-md-6 col-sm-12 text-right">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#user-modal">
-                Add Lecturer
-            </button>
-        </div>
+        <div class="col-md-4 col-sm-6 text-right">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#user-modal">
+        Add Lecturer
+    </button>
+</div>
+<div class="col-md-2 col-sm-6 text-right">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#upload-modal">
+        Upload
+    </button>
+</div>
     </div>
 </div>
 
@@ -71,6 +76,8 @@
 <!-- Add User Modal -->
 <?php include 'modals/create-user-modal.php'?>
 <?php include 'modals/edit-user-modal.php'?>
+<?php include 'modals/batch_users_modal.php'?>
+
 
 </div></div>
 

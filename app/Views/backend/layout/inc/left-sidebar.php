@@ -44,6 +44,18 @@
 						</a>
 
 					</li>
+					<li>
+						<a href="<?= base_url('admin/school') ?>" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-list"></span><span class="mtext">Schools</span>
+						</a>
+
+					</li>
+					<li>
+						<a href="<?= base_url('admin/courses') ?>" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-list"></span><span class="mtext">Courses</span>
+						</a>
+
+					</li>
 					
 					<li>
 						<a href="<?= base_url('admin/logs') ?>" class="dropdown-toggle no-arrow">

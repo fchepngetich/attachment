@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\Students;
 use App\Models\Attachment;
+use App\Models\School;
+use App\Models\Course;
 use App\Libraries\CIAuth;
 use App\Libraries\Hash;
 use App\Models\User;
@@ -43,7 +45,6 @@ public function index()
     $userType = CIAuth::userType(); 
     $studentsModel = new Students();
     $usersModel = new User(); 
- 
     // Debug output
     log_message('info', "User ID: $userId");
     log_message('info', "User Type: $userType");
@@ -64,6 +65,8 @@ public function index()
     }
 
     $students = $studentsModel->findAll();
+    $schoolModel = new School();  
+    $data['schools'] = $schoolModel->findAll();
 
     $data = [
         'full_name' => $full_name,
@@ -73,6 +76,12 @@ public function index()
     return view('backend/pages/home', $data);
 }
 
+public function getCoursesBySchool($schoolId) {
+    $courseModel = new Course();
+    $courses = $courseModel->where('school_id', $schoolId)->findAll();
+
+    return $this->response->setJSON($courses);
+}
 public function studentsHome()
 {
     $full_name = CIAuth::StudentName(); 

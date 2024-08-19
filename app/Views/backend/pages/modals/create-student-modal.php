@@ -21,19 +21,16 @@
                     <input type="text" name="name" class="form-control" required placeholder="Enter full name">
                     <span class="alert error name_error"></span>
                 </div>
-
                 <div class="form-group">
                     <label for="email"><b>Email</b></label>
                     <input type="email" name="email" class="form-control" required placeholder="Enter email">
                     <span class="alert error email_error"></span>
                 </div>
-
                 <div class="form-group">
                     <label for="phone"><b>Phone</b></label>
                     <input type="text" name="phone" class="form-control" required placeholder="Enter phone number">
                     <span class="alert error phone_error"></span>
                 </div>
-
                 <div class="form-group">
                     <label for="year_study"><b>Year of Study</b></label>
                     <select name="year_study" class="form-control" required>
@@ -75,8 +72,6 @@
                     </select>
                     <span class="alert error school_error"></span>
                 </div>
-
-
                 <!-- Course Field -->
                 <div class="form-group">
                     <label for="course"><b>Course</b></label>
