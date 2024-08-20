@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Roles;
 use App\Models\Students;
 use App\Models\School;
+use App\Models\Course;
 
 
 
@@ -46,13 +47,11 @@ class AdminController extends BaseController
         return view('backend/pages/home', $data);
     }
 
-
     public function logoutHandler()
     {
         CIAuth::forget();
-        return redirect()->to(base_url('admin/login'))->with('fail', 'You are logged out');
+        return redirect()->to(base_url('admin/login'))->with('success', 'You are logged out');
     }
-
 
     public function getUsers()
     {
@@ -67,7 +66,6 @@ class AdminController extends BaseController
         $data['users'] = $userModel->findAll();
         return view('backend/pages/users', $data);
     }
-
 
     public function addUser()
     {
@@ -84,8 +82,6 @@ class AdminController extends BaseController
 
         return view('backend/pages/new-user', $data);
     }
-
-
 
     public function createUser()
     {
@@ -233,10 +229,12 @@ class AdminController extends BaseController
     {
         $request = \Config\Services::request();
         $schoolModel = new School();  
-    $data['schools'] = $schoolModel->findAll();
+        $data['schools'] = $schoolModel->findAll();
+        
         if ($request->isAJAX()) {
             $validation = \Config\Services::validation();
-
+    
+            // Validation rules (already correctly set up)
             $validation->setRules([
                 'name' => [
                     'rules' => 'required|string|max_length[255]',
@@ -273,21 +271,22 @@ class AdminController extends BaseController
                         'required' => 'Registration number is required',
                         'is_unique' => 'This registration number is already in use',
                     ]
-                    ],
-                    'school' => [
-        'rules' => 'required|integer',
-        'errors' => [
-            'required' => 'School is required',
-        ]
-    ],
-    'course' => [
-        'rules' => 'required|string|max_length[255]',
-        'errors' => [
-            'required' => 'Course is required',
-        ]
-    ],
+                ],
+                'school' => [
+                    'rules' => 'required|integer',
+                    'errors' => [
+                        'required' => 'School is required',
+                    ]
+                ],
+                'course' => [
+                    'rules' => 'required|string|max_length[255]',
+                    'errors' => [
+                        'required' => 'Course is required',
+                    ]
+                ],
             ]);
-
+    
+            // Validation check
             if (!$validation->withRequest($this->request)->run()) {
                 $errors = $validation->getErrors();
                 return $this->response->setJSON([
@@ -297,11 +296,12 @@ class AdminController extends BaseController
                 ]);
             } else {
                 $studentModel = new Students();
-
+    
+                // Hash the registration number as the password
                 $regNo = $this->request->getPost('reg_no');
                 $hashedPassword = password_hash($regNo, PASSWORD_DEFAULT);
-               
-                                
+    
+                // Prepare the data array for saving
                 $data = [
                     'name' => $this->request->getPost('name'),
                     'email' => $this->request->getPost('email'),
@@ -314,18 +314,19 @@ class AdminController extends BaseController
                     'school_id' => $this->request->getPost('school'),
                     'course' => $this->request->getPost('course'),
                 ];
-
+    
+                // Save the data and handle response
                 if ($studentModel->save($data)) {
+                    // Send welcome email
                     $email = \Config\Services::email();
-
                     $email->setTo($data['email']);
                     $email->setSubject('Welcome to the System');
                     $email->setMessage('Dear ' . $data['name'] . ',<br><br>Welcome to the system. Your registration number is ' . $data['reg_no'] . '.');
-
+    
                     if (!$email->send()) {
                         log_message('error', 'Failed to send email to ' . $data['email']);
                     }
-
+    
                     return $this->response->setJSON([
                         'status' => 1,
                         'msg' => 'Student added successfully.',
@@ -343,6 +344,7 @@ class AdminController extends BaseController
             return $this->response->setStatusCode(400, 'Bad Request');
         }
     }
+    
 
     // public function createStudent()
     // {
@@ -730,7 +732,6 @@ class AdminController extends BaseController
         return redirect()->to(base_url('/admin/home'));
     }
     
-
     public function profile()
     {
         $session = session();
@@ -804,7 +805,6 @@ class AdminController extends BaseController
         ]);
     
         if (!$this->validate($validation->getRules())) {
-            // Log validation errors and return to the previous page with errors
             log_message('error', 'Validation failed: ' . json_encode($validation->getErrors()));
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
@@ -813,7 +813,6 @@ class AdminController extends BaseController
     
         if ($file->isValid() && !$file->hasMoved()) {
             $filePath = $file->getTempName();
-            // Parse the CSV file
             $users = $this->parseCSVFile($filePath);
     
             if (empty($users)) {
@@ -827,10 +826,8 @@ class AdminController extends BaseController
             foreach ($users as $user) {
                 $role = $roleModel->where('name', $user['role'])->first();
                 if ($role) {
-                    // Check if the user already exists
                     $existingUser = $userModel->where('email', $user['email'])->first();
                     if (!$existingUser) {
-                        // Insert the user if not already present
                         $userModel->insert([
                             'full_name' => $user['full_name'],
                             'email' => $user['email'],
@@ -853,8 +850,6 @@ class AdminController extends BaseController
         }
     }
     
-    
-
     private function parseCSVFile($filePath)
     {
         $users = [];
@@ -882,9 +877,117 @@ class AdminController extends BaseController
     
         return $users;
     }
+
+    public function batchUpload()
+    {
+        $validation = \Config\Services::validation();
     
-
-
+        $validation->setRules([
+            'students_csv' => [
+                'label' => 'CSV File',
+                'rules' => 'uploaded[students_csv]|mime_in[students_csv,text/csv,text/plain]|max_size[students_csv,1024]',
+            ],
+        ]);
+    
+        if (!$this->validate($validation->getRules())) {
+            log_message('error', 'Validation failed: ' . json_encode($validation->getErrors()));
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+    
+        $file = $this->request->getFile('students_csv');
+    
+        if ($file->isValid() && !$file->hasMoved()) {
+            $filePath = $file->getTempName();
+            $students = $this->studentsparseCSVFile($filePath);
+    
+            if (empty($students)) {
+                log_message('error', 'No students found in the CSV file.');
+                return redirect()->back()->with('error', 'No students found in the CSV file.');
+            }
+    
+            $studentModel = new Students();
+            $courseModel = new Course(); 
+            $schoolModel = new School(); 
+    
+            $courses = $courseModel->findAll(); 
+            $schools = $schoolModel->findAll(); 
+    
+            $courseLookup = array_column($courses, 'id', 'name');
+            $schoolLookup = array_column($schools, 'id', 'name');
+    
+            foreach ($students as $student) {
+                if (
+                    !empty($student['name']) &&
+                    !empty($student['email']) &&
+                    !empty($student['phone']) &&
+                    !empty($student['year_study']) &&
+                    !empty($student['semester']) &&
+                    !empty($student['reg_no']) &&
+                    !empty($student['school']) &&
+                    !empty($student['course'])
+                ) {
+                    $data = [
+                        'name' => $student['name'],
+                        'email' => $student['email'],
+                        'phone' => $student['phone'],
+                        'year_study' => $student['year_study'],
+                        'semester' => $student['semester'],
+                        'reg_no' => $student['reg_no'],
+                        'school' => $schoolLookup[$student['school']] ?? null,
+                        'course' => $courseLookup[$student['course']] ?? null,
+                        'password' => password_hash($student['reg_no'], PASSWORD_BCRYPT),
+                    ];
+    
+                    if (isset($data['email'])) {
+                        $existingStudent = $studentModel->where('email', $data['email'])->first();
+                        if (!$existingStudent) {
+                            $studentModel->insert($data);
+                        } else {
+                            log_message('info', 'Student already exists, skipping: ' . $data['email']);
+                        }
+                    }
+                } else {
+                    log_message('info', 'Skipping row due to missing mandatory fields: ' . json_encode($student));
+                }
+            }
+    
+            return redirect()->back()->with('success', 'Students uploaded successfully.');
+        } else {
+            log_message('error', 'File upload failed or file has already been moved.');
+            return redirect()->back()->with('error', 'Failed to upload the file.');
+        }
+    }
+    
+    private function studentsparseCSVFile($filePath)
+    {
+        $students = [];
+    
+        if (($handle = fopen($filePath, 'r')) !== FALSE) {
+            $headers = fgetcsv($handle);
+    
+            while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                if (count($data) >= 8) {
+                    $students[] = [
+                        'name' => $data[0] ?? null,
+                        'email' => $data[1] ?? null,
+                        'phone' => $data[2] ?? null,
+                        'year_study' => $data[3] ?? null,
+                        'semester' => $data[4] ?? null,
+                        'reg_no' => $data[5] ?? null,
+                        'school' => $data[6] ?? null,
+                        'course' => $data[7] ?? null,
+                    ];
+                }
+            }
+            fclose($handle);
+        } else {
+            log_message('error', 'Unable to open file: ' . $filePath);
+        }
+    
+        return $students;
+    }
+    
+    
 
 }
 

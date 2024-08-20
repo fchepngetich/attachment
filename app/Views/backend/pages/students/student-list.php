@@ -44,11 +44,15 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if ($attachment['supervisor']): ?>
-                                <a href="<?= base_url('admin/attachment/change-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Change Supervisor</a>
+                        <?php if ($attachment['supervisor'] && !$attachment['supervisor_comments']) : ?>
+                            <a href="<?= base_url('admin/attachment/change-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Change Supervisor</a>
                             <?php else: ?>
-                                <a href="<?= base_url('admin/attachment/assign-supervisor/' . $attachment['id']) ?>" class="btn btn-primary btn-sm">Assign Supervisor</a>
+                                <a href="<?= base_url('admin/attachment/view/' . $attachment['id']) ?>" class="btn btn-primary btn-sm">View Details</a>
+                                <?php endif; ?>
+                            <?php if (!$attachment['supervisor'] ) : ?>
+                            <a href="<?= base_url('admin/attachment/assign-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Assign Supervisor</a>
                             <?php endif; ?>
+
                         </td>
                     </tr>
                 <?php endforeach; ?>

@@ -22,5 +22,37 @@ class Students extends Model
         'school',
     ];
 
+    public function getFilteredStudents($searchData)
+    {
+        $builder = $this->builder();
+
+        if (!empty($searchData['name'])) {
+            $builder->like('name', $searchData['name']);
+        }
+        if (!empty($searchData['email'])) {
+            $builder->like('email', $searchData['email']);
+        }
+        if (!empty($searchData['phone'])) {
+            $builder->like('phone', $searchData['phone']);
+        }
+        if (!empty($searchData['year_study'])) {
+            $builder->like('year_study', $searchData['year_study']);
+        }
+        if (!empty($searchData['semester'])) {
+            $builder->like('semester', $searchData['semester']);
+        }
+        if (!empty($searchData['reg_no'])) {
+            $builder->like('reg_no', $searchData['reg_no']);
+        }
+        if (!empty($searchData['course'])) {
+            $builder->where('course', $searchData['course']);
+        }
+        if (!empty($searchData['school'])) {
+            $builder->where('school', $searchData['school']);
+        }
+
+        return $builder->get()->getResultArray();
+    }
+
    
 }

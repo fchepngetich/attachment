@@ -55,27 +55,26 @@
 
                 <div class="form-group">
                     <label for="reg_no"><b>Registration Number</b></label>
-                    <input type="text" name="reg_no" class="form-control" required
-                        placeholder="Enter registration number">
+                    <input type="text" name="reg_no" class="form-control" required placeholder="Enter registration number">
                     <span class="alert error reg_no_error"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="school"><b>School</b></label>
-                    <select name="school" class="form-control" required>
+                    <select name="school" id="school" class="form-control" required>
                         <option value="">Select School</option>
-                        <option value="1">School of Engineering</option>
-                        <option value="2">School of Business</option>
-                        <option value="3">School of Medicine</option>
-                        <option value="4">School of Arts and Humanities</option>
-                        <option value="5">School of Education</option>
+                        <?php foreach ($schools as $school): ?>
+                            <option value="<?= $school['id'] ?>"><?= $school['name'] ?></option>
+                        <?php endforeach; ?>
                     </select>
                     <span class="alert error school_error"></span>
                 </div>
-                <!-- Course Field -->
+                
                 <div class="form-group">
                     <label for="course"><b>Course</b></label>
-                    <input type="text" name="course" class="form-control" required placeholder="Enter course name">
+                    <select name="course" id="course" class="form-control" required>
+                        <option value="">Select Course</option>
+                    </select>
                     <span class="alert error course_error"></span>
                 </div>
             </div>
@@ -90,3 +89,4 @@
         </form>
     </div>
 </div>
+

@@ -331,5 +331,47 @@ public function updateAttachment()
     return redirect()->to(base_url('admin/attachment/my-students'))->with('message', 'Assessment confirmed successfully');
 }
 
+// public function view($id)
+//     {
+//         $attachmentModel = new Attachment();
+//         $attachment = $attachmentModel->find($id);
+//         $full_name = CIAuth::fullName();
 
+//         if (!$attachment) {
+//             return redirect()->to(base_url('admin/attachment/get'))->with('error', 'Attachment not found');
+//         }
+
+//         return view('backend/pages/students/view-attach-details.php', [
+//             'attachment' => $attachment,
+//           'full_name' => $full_name,
+
+//         ]);
+//     }
+
+    public function view($id)
+    {
+        $full_name = CIAuth::fullName();
+
+        $attachmentModel = new Attachment();
+        $attachment = $attachmentModel->find($id);
+
+        if (!$attachment) {
+            return redirect()->to(base_url('admin/attachment/get'))->with('error', 'Attachment not found');
+        }
+
+        // Fetch related details
+        $studentModel = new Students();
+        $student = $studentModel->find($attachment['student_id']);
+
+        $supervisorModel = new User();
+        $supervisor = $supervisorModel->find($attachment['supervisor_id']);
+
+        return view('backend/pages/students/view-attach-details.php', [
+            'attachment' => $attachment,
+            'student' => $student,
+            'supervisor' => $supervisor,
+            'full_name' => $full_name,
+
+        ]);
+    }
 }

@@ -5,11 +5,13 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+//$routes->get('/', 'Home::index');
 
 $routes->group('admin', static function ($routes) {
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
         $routes->get('home', 'StudentsController::index', ['as' => 'admin.home']);
+        $routes->post('home', 'StudentsController::index', ['as' => 'admin.home']);
+
         $routes->get('attachmentlist', 'StudentsController::studentsHome');
         $routes->get('logout', 'AdminController::logoutHandler');
         $routes->post('get-users', 'AdminController::getUser', ['as' => 'admin.users.get']);
@@ -38,6 +40,10 @@ $routes->group('admin', static function ($routes) {
         $routes->get('edit', 'AdminController::editStudent');
         $routes->post('delete', 'AdminController::deleteStudent');
         $routes->post('update-student', 'AdminController::updateStudent');
+        $routes->get('get-courses-by-school/(:num)', 'StudentsController::getCoursesBySchool/$1');
+        $routes->post('batch-upload', 'AdminController::batchUpload');
+
+
 
     });
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
@@ -48,6 +54,7 @@ $routes->group('admin', static function ($routes) {
         $routes->post('school/edit', 'SchoolController::edit');
         $routes->post('school/update', 'SchoolController::update');
         $routes->delete('school/delete/(:num)', 'SchoolController::delete/$1');
+
     });
 
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
@@ -71,6 +78,8 @@ $routes->group('admin', static function ($routes) {
         $routes->get('my-students', 'AttachmentController::students');
         $routes->get('assessment-form/(:num)', 'AttachmentController::assessmentForm/$1');
         $routes->post('confirm-assessment', 'AttachmentController::confirmAssessment');
+        $routes->get('view/(:num)', 'AttachmentController::view/$1');
+
 
     });
 

@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <div class="container mt-5">
+    <div class="mt-5">
         <?php if (session()->getFlashdata('message')): ?>
             <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
         <?php endif; ?>
