@@ -66,11 +66,9 @@
                     <label for="edit-school"><b>School</b></label>
                     <select id="edit-school" name="school" class="form-control" required>
                         <option value="">Select School</option>
-                        <option value="1">School of Engineering</option>
-                        <option value="2">School of Business</option>
-                        <option value="3">School of Medicine</option>
-                        <option value="4">School of Arts and Humanities</option>
-                        <option value="5">School of Education</option>
+                        <?php foreach ($schools as $school): ?>
+                            <option value="<?= $school['id'] ?>"><?= $school['name'] ?></option>
+                        <?php endforeach; ?>
                     </select>
                     <span class="alert error school_error"></span>
                 </div>
@@ -79,11 +77,9 @@
                     <label for="edit-course"><b>Course</b></label>
                     <select id="edit-course" name="course" class="form-control" required>
                         <option value="">Select Course</option>
-                        <option value="1">Computer Science</option>
-                        <option value="2">Business Administration</option>
-                        <option value="3">Medicine</option>
-                        <option value="4">Fine Arts</option>
-                        <option value="5">Education</option>
+                        <?php foreach ($courses as $course): ?>
+                            <option value="<?= $course['id'] ?>"><?= $course['name'] ?></option>
+                        <?php endforeach; ?>
                     </select>
                     <span class="alert error course_error"></span>
                 </div>

@@ -95,13 +95,12 @@ class StudentsController extends BaseController
     $userId = CIAuth::id();
     $userType = CIAuth::userType();
 
-    // Initialize models
     $studentsModel = new Students();
     $usersModel = new User();
     $schoolModel = new School();
     $courseModel = new Course();
+    $userModel= new User();
 
-    // Determine full name based on user type
     switch ($userType) {
         case 'student':
             $student = $studentsModel->find($userId);
@@ -117,7 +116,6 @@ class StudentsController extends BaseController
             break;
     }
 
-    // Handle search if form is submitted
     if ($this->request->getMethod() === 'post') {
         $searchData = [
             'name' => $this->request->getPost('name'),
@@ -128,23 +126,21 @@ class StudentsController extends BaseController
             'course_id' => $this->request->getPost('course_id'),
         ];
 
-        // Retrieve the filtered students based on the input
         $students = $studentsModel->getFilteredStudents($searchData);
 
-        // Pass the data to the view
         return view('admin/home', [
             'students' => $students,
             'schools' => $schoolModel->findAll(),
             'courses' => $courseModel->findAll(),
-            'searchData' => $searchData, // Pass the search parameters
+            'searchData' => $searchData, 
             'full_name' => $full_name,
         ]);
     } else {
-        // Fetch all students, schools, and courses
         $students = $studentsModel->findAll();
         $schools = $schoolModel->findAll();
         $courses = $courseModel->findAll();
-
+        $usersModel = $userModel->findAll();
+       
         $data = [
             'full_name' => $full_name,
             'students' => $students,
@@ -163,6 +159,7 @@ class StudentsController extends BaseController
 
         return $this->response->setJSON($courses);
     }
+   
     public function studentsHome()
     {
         $full_name = CIAuth::StudentName();
@@ -276,7 +273,7 @@ class StudentsController extends BaseController
 
         $attachmentModel = new Attachment();
         if ($attachmentModel->save($data)) {
-            return redirect()->to(base_url('admin/home'))->with('message', 'Attachment created successfully');
+            return redirect()->to(base_url('admin/attachmentlist'))->with('message', 'Attachment created successfully');
         } else {
             return redirect()->back()->withInput()->with('error', 'Failed to create attachment');
         }
@@ -296,7 +293,6 @@ class StudentsController extends BaseController
             return redirect()->to(base_url('admin/attachment/attachment-details'))->with('error', 'You are not authorized to confirm this assessment');
         }
 
-        // Confirm the assessment
         $attachmentModel->update($attachmentId, [
             'is_student_confirmed' => true,
             'confirmation_date' => date('Y-m-d H:i:s')
@@ -304,5 +300,20 @@ class StudentsController extends BaseController
 
         return redirect()->to(base_url('admin/attachment/attachment-details'))->with('message', 'Assessment confirmed successfully');
     }
+
+    public function newgetCoursesBySchool()
+    {
+        $schoolId = $this->request->getGet('school_id');
+        $coursesModel = new Course();
+
+        $courses = $coursesModel->where('id', $schoolId)->findAll();
+
+        if ($courses) {
+            return $this->response->setJSON(['status' => 1, 'courses' => $courses]);
+        } else {
+            return $this->response->setJSON(['status' => 0, 'msg' => 'No courses found for the selected school.']);
+        }
+    }
+
 
 }

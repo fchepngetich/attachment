@@ -60,18 +60,15 @@ class AttachmentController extends BaseController
         $attachmentModel = new Attachment();
         $id = CIAuth::id();
         $fullName = CIAuth::StudentName();
-
+    
         $attachmentDetails = $attachmentModel->where('student_id', $id)->first();
-
-        if (!$attachmentDetails) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Attachment not found');
-        }
-
+    
         $data = [
             'attachmentDetails' => $attachmentDetails,
-            'full_name' =>$fullName,
+            'full_name' => $fullName,
+            'hasAttachment' => $attachmentDetails !== null, // Flag to check if attachment details exist
         ];
-
+    
         return view('backend/pages/students/attachment-details', $data);
     }
     
@@ -276,14 +273,25 @@ public function updateAttachment()
     public function students()
     {
         $full_name = CIAuth::fullName();
-
-        $studentModel = new attachment();
+        
+        $studentModel = new Students();
+        $attachmentModel = new attachment();
+        
         $supervisor_id = CIAuth::id(); 
-        $data = ['full_name' => $full_name];
-        $data['students'] = $studentModel->where('supervisor_id', $supervisor_id)->findAll();
-
+        $students = $attachmentModel->where('supervisor_id', $supervisor_id)->findAll();
+    
+        foreach ($students as &$student) {
+            $student['name'] = $studentModel->getStudentNameById($student['student_id']);
+        }
+    
+        $data = [
+            'full_name' => $full_name,
+            'students' => $students
+        ];
+        
         return view('backend/pages/students/my-students', $data);
     }
+    
 
     public function assessmentForm($attachmentId)
     {
@@ -304,8 +312,6 @@ public function updateAttachment()
         return view('backend/pages/students/confirm_assessment_form', $data);
     }
     
-    
-
     public function confirmAssessment()
 {
     $attachmentId = $this->request->getPost('attachment_id');
@@ -374,4 +380,87 @@ public function updateAttachment()
 
         ]);
     }
+
+    public function searchAttachedStudents()
+    {
+        $searchData = $this->request->getPost(); 
+        $attachmentModel = new Attachment();
+        $studentModel = new Students();
+        $supervisorModel = new User();
+        $full_name = CIAuth::fullName();
+    
+        // Get all students and supervisors to create lookup arrays
+        $students = $studentModel->findAll();
+        $studentLookup = [];
+        foreach ($students as $student) {
+            $studentLookup[$student['id']] = $student['name'];
+        }
+    
+        $supervisors = $supervisorModel->findAll();
+        $supervisorLookup = [];
+        foreach ($supervisors as $supervisor) {
+            $supervisorLookup[$supervisor['id']] = $supervisor['full_name'];
+        }
+    
+        // Apply search filters to the attachment model
+        if (!empty($searchData['student_name'])) {
+            $studentIds = array_keys(array_filter($studentLookup, function($name) use ($searchData) {
+                return stripos($name, $searchData['student_name']) !== false;
+            }));
+            $attachmentModel->whereIn('student_id', $studentIds);
+        }
+        
+        if (!empty($searchData['company_name'])) {
+            $attachmentModel->like('company_name', $searchData['company_name']);
+        }
+        
+        if (!empty($searchData['county'])) {
+            $attachmentModel->like('county', $searchData['county']);
+        }
+        
+        if (!empty($searchData['start_date'])) {
+            $attachmentModel->where('date_start >=', $searchData['start_date']);
+        }
+        
+        if (!empty($searchData['end_date'])) {
+            $attachmentModel->where('date_end <=', $searchData['end_date']);
+        }
+        
+        if (!empty($searchData['supervisor'])) {
+            $supervisorIds = array_keys(array_filter($supervisorLookup, function($name) use ($searchData) {
+                return stripos($name, $searchData['supervisor']) !== false;
+            }));
+            $attachmentModel->whereIn('supervisor_id', $supervisorIds);
+        }
+    
+        // Fetch all matching attachments
+        $attachments = $attachmentModel->findAll();
+    
+        // Replace IDs with names in attachments
+        foreach ($attachments as &$attachment) {
+            $attachment['student_name'] = $studentLookup[$attachment['student_id']] ?? 'Unknown Student';
+            
+            if (!empty($attachment['supervisor_id'])) {
+                $attachment['supervisor_name'] = $supervisorLookup[$attachment['supervisor_id']] ?? 'Unknown Supervisor';
+            } else {
+                $attachment['supervisor_name'] = 'Not Assigned';
+            }
+        }
+    
+        // Prepare data for view
+        $data = [
+            'attachments' => $attachments,
+            'searchData' => $searchData,
+            'full_name' => $full_name,
+        ];
+    
+        // Return the view with the data
+        return view('backend/pages/students/student-list', $data);
+    }
+    
+    
+    
+    
+
+
 }

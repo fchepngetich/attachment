@@ -27,6 +27,8 @@
 							<span class="micon dw dw-group"></span><span class="mtext">My Students</span>
 						</a>
 					</li>
+					<?php if (App\Libraries\CIAuth::userType() === 'lecturer' && App\Libraries\CIAuth::role() === "1"): ?>
+
 					<li>
 						<a href="<?= base_url('/admin/get-users') ?>" class="dropdown-toggle no-arrow">
 							<span class="micon dw dw-user"></span><span class="mtext">Lecturers</span>
@@ -53,12 +55,14 @@
 							<span class="micon dw dw-analytics-21"></span><span class="mtext">System Logs</span>
 						</a>
 					</li>
+					<?php endif ?>
+
 				<?php endif ?>
 
 				<?php if (App\Libraries\CIAuth::userType() === 'student'): ?>
 					<li>
 						<a href="<?= base_url('/admin/attachmentlist') ?>" class="dropdown-toggle no-arrow">
-							<span class="micon dw dw-list3"></span><span class="mtext">Attachment List</span>
+							<span class="micon dw dw-house-1"></span><span class="mtext">Home</span>
 						</a>
 					</li>
 					<li>

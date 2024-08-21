@@ -42,8 +42,8 @@ $routes->group('admin', static function ($routes) {
         $routes->post('update-student', 'AdminController::updateStudent');
         $routes->get('get-courses-by-school/(:num)', 'StudentsController::getCoursesBySchool/$1');
         $routes->post('batch-upload', 'AdminController::batchUpload');
-
-
+        $routes->get('new-get-courses-by-school', 'StudentsController::newgetCoursesBySchool');
+        $routes->post('search', 'AdminController::search');
 
     });
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
@@ -76,9 +76,14 @@ $routes->group('admin', static function ($routes) {
         $routes->get('edit-attachment/(:num)', 'AttachmentController::editAttachment/$1');
         $routes->post('update-attachment', 'AttachmentController::updateAttachment');
         $routes->get('my-students', 'AttachmentController::students');
+        $routes->post('my-students', 'AttachmentController::students');
+
         $routes->get('assessment-form/(:num)', 'AttachmentController::assessmentForm/$1');
         $routes->post('confirm-assessment', 'AttachmentController::confirmAssessment');
         $routes->get('view/(:num)', 'AttachmentController::view/$1');
+        $routes->post('search-attached-students', 'AttachmentController::searchAttachedStudents');
+
+
 
 
     });

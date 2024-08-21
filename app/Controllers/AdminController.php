@@ -438,16 +438,27 @@ class AdminController extends BaseController
     public function editStudent()
     {
         $studentModel = new Students();
+        $schoolModel = new School();
+        $courseModel = new Course(); 
+    
         $studentId = $this->request->getGet('id');
-
+    
         $student = $studentModel->find($studentId);
         if ($student) {
-            return $this->response->setJSON(['status' => 1, 'data' => $student]);
+            $school = $schoolModel->find($student['school']);
+            $course = $courseModel->find($student['course']);
+    
+            return $this->response->setJSON([
+                'status' => 1, 
+                'data' => $student,
+                'school' => $school,
+                'course' => $course
+            ]);
         } else {
             return $this->response->setJSON(['status' => 0, 'msg' => 'Student not found.']);
         }
     }
-    public function updateStudent()
+        public function updateStudent()
     {
         $studentModel = new Students();
         $studentId = $this->request->getPost('id');
@@ -473,7 +484,6 @@ class AdminController extends BaseController
             'course' => $this->request->getPost('course'),
         ];
     
-        // Check if the email is already in use by another student
         $emailInUse = $studentModel->where('email', $newData['email'])
                                    ->where('id !=', $studentId)
                                    ->first();
@@ -988,6 +998,51 @@ class AdminController extends BaseController
     }
     
     
+    public function search()
+{
+    $studentModel = new Students();
+    $schoolModel = new School();
+    $courseModel = new Course();
+    $full_name = CIAuth::fullName();
+
+    $searchData = [
+        'name' => $this->request->getPost('name'),
+        'email' => $this->request->getPost('email'),
+        'phone' => $this->request->getPost('phone'),
+        'reg_no' => $this->request->getPost('reg_no'),
+        'school' => $this->request->getPost('school_id'),
+        'course' => $this->request->getPost('course_id'),
+    ];
+    
+    $builder = $studentModel->builder();
+    
+    if (!empty($searchData['name'])) {
+        $builder->like('name', $searchData['name']);
+    }
+    if (!empty($searchData['email'])) {
+        $builder->like('email', $searchData['email']);
+    }
+    if (!empty($searchData['phone'])) {
+        $builder->like('phone', $searchData['phone']);
+    }
+    if (!empty($searchData['reg_no'])) {
+        $builder->like('reg_no', $searchData['reg_no']);
+    }
+    if (!empty($searchData['school'])) {
+        $builder->where('school', $searchData['school']);
+    }
+    if (!empty($searchData['course'])) {
+        $builder->where('course', $searchData['course']);
+    }
+
+    $data['students'] = $builder->get()->getResultArray();
+    $data['schools'] = $schoolModel->findAll();
+    $data['courses'] = $courseModel->findAll();
+    $data['searchData'] = $searchData;
+    $data['full_name'] = $full_name;
+
+    return view('backend/pages/home', $data); 
+}
 
 }
 

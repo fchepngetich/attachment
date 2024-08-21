@@ -36,7 +36,7 @@
             <?php $count=1; foreach ($students as $student): ?>
                 <tr>
                     <td><?= $count++; ?></td>
-                    <td><?= $student['student_id']; ?></td>
+                    <td><?= $student['name']; ?></td>
                     <td><?= $student['company_name']; ?></td>
                     <td><?= $student['county']; ?></td>
                     <td><?= $student['date_start']; ?></td>

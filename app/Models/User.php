@@ -14,4 +14,20 @@ class User extends Model
     {
         return $this->where('id', $id)->first()['full_name'];
     }
+    public function getSupervisorNameById($supervisorId)
+    {
+        $builder = $this->builder();
+        $builder->select('full_name'); 
+        $builder->where('id', $supervisorId); 
+        
+        $query = $builder->get();
+        
+        if ($query->getNumRows() > 0) {
+            return $query->getRow()->full_name;
+        } else {
+            return null; 
+        }
+
+   
+}
 }

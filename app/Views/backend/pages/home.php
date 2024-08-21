@@ -10,23 +10,25 @@
                     </div>
 
                 </div>
-                <div class="col-md-3 col-sm-6 text-right">
+                <?php if (App\Libraries\CIAuth::role() === "1"): ?>
+
+                <div class="col-md-2 col-sm-6 text-right">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                         data-target="#student-modal">
                         Add Student
                     </button>
                 </div>
-                <!-- Button to Open Batch Upload Modal -->
-                <div class="col-md-3 col-sm-6 text-right">
+                <div class="col-md-2 col-sm-6 text-right">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                         data-target="#batch-upload-modal">
                         Upload
                     </button>
                 </div>
+                <?php endif;?>
             </div>
         </div>
 
-        <form method="post" action="<?= base_url('admin/home') ?>">
+        <form method="post" action="<?= base_url('admin/students/search') ?>">
             <div class="row mb-3">
                 <div class="col-md-3">
                     <input type="text" class="form-control" name="name" placeholder="Name" value="<?= esc($searchData['name'] ?? '') ?>">
@@ -64,11 +66,13 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn btn-sm btn-info">Search</button>
+                    <span>
+                    <a href="<?= base_url('admin/home') ?>" class="btn btn-sm btn-info">Reset</a>
+                    </span>
                 </div>
             </div>
         </form>
-
 
         <div class="row">
             <div class="col-md-12">
@@ -83,7 +87,11 @@
                                     <th scope="col">Year</th>
                                     <th scope="col">Semester</th>
                                     <th scope="col">Reg No</th>
+                                    <?php if (App\Libraries\CIAuth::role() === "1"): ?>
+
                                     <th scope="col">Action</th>
+                                    
+                                    <?php endif;?>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,6 +103,8 @@
                                         <td><?= $student['year_study'] ?></td>
                                         <td><?= $student['semester'] ?></td>
                                         <td><?= $student['reg_no'] ?></td>
+                                        <?php if (App\Libraries\CIAuth::role() === "1"): ?>
+
                                         <td>
                                             <button type="button" class="btn btn-sm btn-warning edit-student-btn"
                                                 data-id="<?= $student['id'] ?>">
@@ -105,6 +115,7 @@
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
+                                        <?php endif;?>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -123,18 +134,27 @@
     </div>
     <?= $this->endSection() ?>
 </div>
-<?= $this->section('stylesheets') ?>
+<?= $this->section('stylesheets')?>
+<link rel="stylesheet" href="/backend/src/plugins/datatables/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/backend/src/plugins/datatables/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-
-<?= $this->endSection() ?>
+<link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.min.css">
+<link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.structure.min.css">
+<link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.theme.min.css">
+<?= $this->endSection()?>
 
 <?= $this->section('scripts') ?>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
-
+<script src="/backend/src/plugins/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/backend/src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
+<script src="/backend/src/plugins/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/backend/src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="/extra-assets/jquery-ui-1.13.3/jquery-ui.min.js"></script>
 <script>
     $(document).ready(function () {
+        $('#students-table').DataTable({
 
+        });
         $('#school').change(function () {
             var schoolId = $(this).val();
             if (schoolId) {
@@ -157,7 +177,6 @@
         });
 
 
-        // Add Student
         $('#add-student-form').on('submit', function (e) {
             e.preventDefault();
             var csrfName = $('.ci_csrf_data').attr('name');
@@ -224,6 +243,10 @@
                             $('#edit-year_study').val(response.data.year_study);
                             $('#edit-semester').val(response.data.semester);
                             $('#edit-reg_no').val(response.data.reg_no);
+                            $('#edit-school').val(response.data.school);
+                            $('#edit-course').val(response.data.course);
+
+
 
                             $('#edit-student-modal').modal('show');
                         } else {

@@ -21,6 +21,7 @@ class Students extends Model
         'course',
         'school',
     ];
+    
 
     public function getFilteredStudents($searchData)
     {
@@ -54,5 +55,24 @@ class Students extends Model
         return $builder->get()->getResultArray();
     }
 
+    public function getStudentNameById($studentId)
+    {
+        $builder = $this->builder();
+        $builder->select('name'); 
+        $builder->where('id', $studentId); 
+        
+        $query = $builder->get();
+        
+        if ($query->getNumRows() > 0) {
+            return $query->getRow()->name;
+        } else {
+            return null; 
+        }
+
    
+}
+
+
+
+
 }

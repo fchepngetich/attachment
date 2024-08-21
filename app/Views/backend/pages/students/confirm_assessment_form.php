@@ -24,7 +24,10 @@
         <label for="comments">Supervisor Comments:</label>
         <textarea name="comments" id="comments" class="form-control" rows="4" required></textarea>
     </div>
-    <button type="submit" class="btn btn-success">Confirm Assessment</button>
+    <button type="submit" class="btn btn-sm btn-info">Confirm Assessment</button>
+    <span>
+        <a href="javascript:history.back()" class="btn btn-sm btn-info">Cancel</a>
+    </span>
 </form>
 
 </div>
