@@ -67,10 +67,26 @@ class Students extends Model
             return $query->getRow()->name;
         } else {
             return null; 
-        }
-
-   
+        } 
 }
+public function getStudentById($id)
+{
+    return $this->where('id', $id)->first();
+}
+
+public function getCourseById($course_id)
+    {
+        $db = \Config\Database::connect();
+        $query = $db->table('courses')->where('id', $course_id)->get();
+        return $query->getRow();
+    }
+
+    public function getSchoolById($school_id)
+    {
+        $db = \Config\Database::connect();
+        $query = $db->table('schools')->where('id', $school_id)->get();
+        return $query->getRow();
+    }
 
 
 

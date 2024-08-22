@@ -21,8 +21,9 @@
         </div>
     </div>
     
-    <div class="container mt-5">
+    <div class="container card mt-5">
   
+    <div class="card-body">
 
     <form action="<?= base_url('admin/attachment/assign-supervisor/save') ?>" method="POST">
         <?= csrf_field() ?>
@@ -36,11 +37,11 @@
                 <?php endforeach; ?>
             </select>
         </div>
-        <button type="submit" class="btn btn-primary">Assign</button>
-        <a href="<?= base_url('admin/students') ?>" class="btn btn-secondary">Cancel</a>
-    </form>
+        <button type="submit" class="btn btn-sm btn-primary">Assign</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="history.back()">Cancel</button>
+        </form>
 
-</div>
+</div></div>
 
 
 <?= $this->endSection() ?>

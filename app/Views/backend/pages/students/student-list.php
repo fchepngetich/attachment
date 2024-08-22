@@ -57,13 +57,22 @@
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Supervisor</th>
+                        <?php if (App\Libraries\CIAuth::role() === "1" | App\Libraries\CIAuth::role() === "2"): ?>
+
                         <th>Action</th>
+                        
+                        <?php endif;?>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($attachments as $attachment): ?>
                         <tr>
-                            <td><?= esc($attachment['student_name']) ?></td>
+                            <td>
+                            <a href="<?= base_url('admin/students/details/' . $attachment['student_id']) ?>">
+                            <?= esc($attachment['student_name']) ?>                                        </a>
+                        
+                        
+                        </td>
                             <td><?= esc($attachment['company_name']) ?></td>
                             <td><?= esc($attachment['company_location']) ?></td>
                             <td><?= esc($attachment['county']) ?></td>
@@ -78,6 +87,7 @@
                                     }
                                 ?>
                             </td>
+                            <?php if (App\Libraries\CIAuth::role() === "1" | App\Libraries\CIAuth::role() === "2"): ?>
 
                             <td>
                                 <?php if ($attachment['supervisor_id'] && !$attachment['supervisor_comments']) : ?>
@@ -89,6 +99,7 @@
                                     <a href="<?= base_url('admin/attachment/assign-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Assign Supervisor</a>
                                 <?php endif; ?>
                             </td>
+                            <?php endif;?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

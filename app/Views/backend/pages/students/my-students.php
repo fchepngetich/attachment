@@ -36,7 +36,12 @@
             <?php $count=1; foreach ($students as $student): ?>
                 <tr>
                     <td><?= $count++; ?></td>
-                    <td><?= $student['name']; ?></td>
+                    <td>
+                    <a href="<?= base_url('admin/students/details/' . $student['student_id']) ?>">
+
+                        <?= $student['name']; ?>
+                    
+                    </td>
                     <td><?= $student['company_name']; ?></td>
                     <td><?= $student['county']; ?></td>
                     <td><?= $student['date_start']; ?></td>

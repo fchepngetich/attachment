@@ -44,6 +44,9 @@ $routes->group('admin', static function ($routes) {
         $routes->post('batch-upload', 'AdminController::batchUpload');
         $routes->get('new-get-courses-by-school', 'StudentsController::newgetCoursesBySchool');
         $routes->post('search', 'AdminController::search');
+        $routes->get('details/(:num)', 'StudentsController::viewStudentDetails/$1');
+
+
 
     });
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {

@@ -316,4 +316,32 @@ class StudentsController extends BaseController
     }
 
 
+
+ 
+
+    public function viewStudentDetails($id)
+    {
+        $studentsModel = new Students();
+        $fullName = CIAuth::fullName();
+
+        // Get student information
+        $student = $studentsModel->getStudentById($id);
+
+        $course = $studentsModel->getCourseById($student['course']);
+        $school = $studentsModel->getSchoolById($student['school']);
+
+        $data = [
+            'student' => $student,
+            'course' => $course,
+            'school' => $school,
+            'full_name' => $fullName,
+        ];
+
+        return view('backend/pages/students/student-details', $data);
+    }
+
+    
+
+
+
 }

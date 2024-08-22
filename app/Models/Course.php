@@ -11,4 +11,5 @@ class Course extends Model
         protected $primaryKey = 'id';
         protected $allowedFields = ['name','school_id'];
     
+        
 }

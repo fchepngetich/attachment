@@ -10,7 +10,8 @@
                     </div>
 
                 </div>
-                <?php if (App\Libraries\CIAuth::role() === "1"): ?>
+                <?php if (App\Libraries\CIAuth::role() === "1" | App\Libraries\CIAuth::role() === "2"): ?>
+                    <div class="col-md-2 col-sm-6 text-right"></div>
 
                 <div class="col-md-2 col-sm-6 text-right">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
@@ -87,7 +88,7 @@
                                     <th scope="col">Year</th>
                                     <th scope="col">Semester</th>
                                     <th scope="col">Reg No</th>
-                                    <?php if (App\Libraries\CIAuth::role() === "1"): ?>
+                                    <?php if (App\Libraries\CIAuth::role() === "1" | App\Libraries\CIAuth::role() === "2"): ?>
 
                                     <th scope="col">Action</th>
                                     
@@ -97,19 +98,24 @@
                             <tbody>
                                 <?php foreach ($students as $student): ?>
                                     <tr>
-                                        <td><?= $student['name'] ?></td>
+                                    <td>
+                                        <a href="<?= base_url('admin/students/details/' . $student['id']) ?>">
+                                            <?= esc($student['name']) ?>
+                                        </a>
+                                    </td>
                                         <td><?= $student['email'] ?></td>
                                         <td><?= $student['phone'] ?></td>
                                         <td><?= $student['year_study'] ?></td>
                                         <td><?= $student['semester'] ?></td>
                                         <td><?= $student['reg_no'] ?></td>
-                                        <?php if (App\Libraries\CIAuth::role() === "1"): ?>
+                                        <?php if (App\Libraries\CIAuth::role() === "1" | App\Libraries\CIAuth::role() === "2"): ?>
 
                                         <td>
                                             <button type="button" class="btn btn-sm btn-warning edit-student-btn"
                                                 data-id="<?= $student['id'] ?>">
                                                 <i class="fa fa-edit"></i>
                                             </button>
+                                            
                                             <button type="button" class="btn btn-sm btn-danger delete-student-btn"
                                                 data-id="<?= $student['id'] ?>">
                                                 <i class="fa fa-trash"></i>
@@ -155,28 +161,7 @@
         $('#students-table').DataTable({
 
         });
-        $('#school').change(function () {
-            var schoolId = $(this).val();
-            if (schoolId) {
-                $.ajax({
-                    url: "<?= base_url('admin/students/get-courses-by-school/') ?>" + schoolId,
-                    type: "GET",
-                    dataType: "json",
-                    success: function (data) {
-                        $('#course').empty();
-                        $('#course').append('<option value="">Select Course</option>');
-                        $.each(data, function (key, value) {
-                            $('#course').append('<option value="' + value.id + '">' + value.name + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#course').empty();
-                $('#course').append('<option value="">Select Course</option>');
-            }
-        });
-
-
+     
         $('#add-student-form').on('submit', function (e) {
             e.preventDefault();
             var csrfName = $('.ci_csrf_data').attr('name');
@@ -224,145 +209,162 @@
             });
         });
 
+    $('#students-table').DataTable();
 
+    // Delegate event for dynamically created buttons
+    $('#students-table').on('click', '.edit-student-btn', function () {
+        var studentId = $(this).data('id');
+        $.ajax({
+            url: '<?= base_url('admin/students/edit') ?>',
+            method: 'GET',
+            data: { id: studentId },
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 1) {
+                    $('#edit-student-id').val(response.data.id);
+                    $('#edit-name').val(response.data.name);
+                    $('#edit-email').val(response.data.email);
+                    $('#edit-phone').val(response.data.phone);
+                    $('#edit-year_study').val(response.data.year_study);
+                    $('#edit-semester').val(response.data.semester);
+                    $('#edit-reg_no').val(response.data.reg_no);
+                    $('#edit-school').val(response.data.school);
+                    $('#edit-course').val(response.data.course);
+                    $('#edit-student-modal').modal('show');
+                } else {
+                    toastr.error('Failed to fetch student data.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX request failed:", xhr, status, error);
+                toastr.error('An error occurred. Please try again.');
+            }
+        });
+    });
 
-        $(document).ready(function () {
-            $('.edit-student-btn').on('click', function () {
-                var studentId = $(this).data('id');
+    // Delegate event for dynamically created delete buttons
+    $('#students-table').on('click', '.delete-student-btn', function () {
+        var studentId = $(this).data('id');
+        Swal.fire({
+            title: 'Are you sure you want to delete this student?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
                 $.ajax({
-                    url: '<?= base_url('admin/students/edit') ?>',
-                    method: 'GET',
-                    data: { id: studentId },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 1) {
-                            $('#edit-student-id').val(response.data.id);
-                            $('#edit-name').val(response.data.name);
-                            $('#edit-email').val(response.data.email);
-                            $('#edit-phone').val(response.data.phone);
-                            $('#edit-year_study').val(response.data.year_study);
-                            $('#edit-semester').val(response.data.semester);
-                            $('#edit-reg_no').val(response.data.reg_no);
-                            $('#edit-school').val(response.data.school);
-                            $('#edit-course').val(response.data.course);
-
-
-
-                            $('#edit-student-modal').modal('show');
-                        } else {
-                            toastr.error('Failed to fetch student data.');
-                        }
+                    url: '<?= base_url('admin/students/delete') ?>',
+                    method: 'POST',
+                    data: {
+                        id: studentId,
+                        <?= csrf_token() ?>: '<?= csrf_hash() ?>'
                     },
-                    error: function (xhr, status, error) {
-                        console.error("AJAX request failed:", xhr, status, error);
-                        toastr.error('An error occurred. Please try again.');
-                    }
-                });
-            });
-
-            $('#edit-student-form').on('submit', function (e) {
-                e.preventDefault();
-
-                var form = this;
-                var formData = new FormData(form);
-
-                $.ajax({
-                    url: $(form).attr('action'),
-                    method: $(form).attr('method'),
-                    data: formData,
-                    processData: false,
                     dataType: 'json',
-                    contentType: false,
-                    cache: false,
-                    beforeSend: function () {
-                        toastr.remove();
-                        $(form).find('span.error-text').text('');
-                    },
                     success: function (response) {
                         if (response.token) {
-                            $('input[name="<?= csrf_token() ?>"]').val(response.token);
+                            $('.ci_csrf_data').val(response.token);
                         }
                         if (response.status === 1) {
-                            $(form)[0].reset();
-                            $('#edit-student-modal').modal('hide');
-                            toastr.success(response.msg);
-                            location.reload();
-                        } else if (response.status === 0) {
-                            toastr.error(response.msg);
+                            Swal.fire(
+                                'Deleted!',
+                                response.msg,
+                                'success'
+                            ).then(() => {
+                                $('#students-table').DataTable().ajax.reload();
+                            });
                         } else {
-                            if (response.errors) {
-                                $.each(response.errors, function (prefix, val) {
-                                    $(form).find('span.' + prefix + '_error').text(val);
-                                });
-                            } else {
-                                toastr.error('An unexpected error occurred.');
-                            }
+                            Swal.fire(
+                                'Error!',
+                                response.msg,
+                                'error'
+                            );
                         }
                     },
                     error: function (xhr, status, error) {
                         console.error("AJAX request failed:", xhr, status, error);
-                        toastr.error('An error occurred. Please try again.');
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred. Please try again.',
+                            'error'
+                        );
                     }
                 });
-            });
+            }
         });
+    });
 
-        // Delete Student
-        $('.delete-student-btn').on('click', function () {
-            var studentId = $(this).data('id');
-            Swal.fire({
-                title: 'Are you sure you want to delete this student?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '<?= base_url('admin/students/delete') ?>',
-                        method: 'POST',
-                        data: {
-                            id: studentId,
-                            <?= csrf_token() ?>: '<?= csrf_hash() ?>'
-                        },
-                        dataType: 'json',
-                        success: function (response) {
-                            console.log('AJAX Response:', response);
+    $('#edit-student-form').on('submit', function (e) {
+        e.preventDefault();
+        var form = this;
+        var formData = new FormData(form);
 
-                            if (response.token) {
-                                $('.ci_csrf_data').val(response.token);
-                            }
-                            if (response.status === 1) {
-                                Swal.fire(
-                                    'Deleted!',
-                                    response.msg,
-                                    'success'
-                                ).then(() => {
-                                    location.reload();
-                                });
-                                $('#student-row-' + studentId).remove();
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    response.msg,
-                                    'error'
-                                )
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("AJAX request failed:", xhr, status, error);
-                            Swal.fire(
-                                'Error!',
-                                'An error occurred. Please try again.',
-                                'error'
-                            )
-                        }
+        $.ajax({
+            url: $(form).attr('action'),
+            method: $(form).attr('method'),
+            data: formData,
+            processData: false,
+            dataType: 'json',
+            contentType: false,
+            cache: false,
+            beforeSend: function () {
+                toastr.remove();
+                $(form).find('span.error-text').text('');
+            },
+            success: function (response) {
+                if (response.token) {
+                    $('input[name="<?= csrf_token() ?>"]').val(response.token);
+                }
+                if (response.status === 1) {
+                    $(form)[0].reset();
+                    $('#edit-student-modal').modal('hide');
+                    toastr.success(response.msg);
+                    $('#students-table').DataTable().ajax.reload();
+                } else if (response.status === 0) {
+                    toastr.error(response.msg);
+                } else {
+                    if (response.errors) {
+                        $.each(response.errors, function (prefix, val) {
+                            $(form).find('span.' + prefix + '_error').text(val);
+                        });
+                    } else {
+                        toastr.error('An unexpected error occurred.');
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX request failed:", xhr, status, error);
+                toastr.error('An error occurred. Please try again.');
+            }
+        });
+    });
+
+    $('#school').change(function () {
+        var schoolId = $(this).val();
+        if (schoolId) {
+            $.ajax({
+                url: "<?= base_url('admin/students/get-courses-by-school/') ?>" + schoolId,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#course').empty();
+                    $('#course').append('<option value="">Select Course</option>');
+                    $.each(data, function (key, value) {
+                        $('#course').append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
                 }
             });
-        });
+        } else {
+            $('#course').empty();
+            $('#course').append('<option value="">Select Course</option>');
+        }
+    });
+
+
+
+
     });
 </script>
 

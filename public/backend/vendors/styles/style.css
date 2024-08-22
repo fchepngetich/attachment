@@ -100,3 +100,7 @@ input:not(:placeholder-shown) + .date-placeholder {
 .min-height-200px{
     min-height: 370px !important;
 }
+
+tbody a{color: #CB6015 !important;}
+
+.details .card-body{padding: .4rem !important;}

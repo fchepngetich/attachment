@@ -108,13 +108,14 @@
 });
 
     $('.edit-course-btn').on('click', function() {
+        
         var courseId = $(this).data('id');
         $.ajax({
             url: '<?= base_url('admin/courses/edit') ?>',
             method: 'POST',
             data: {
                 id: courseId,
-                <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
             },
             dataType: 'json',
             success: function(response) {

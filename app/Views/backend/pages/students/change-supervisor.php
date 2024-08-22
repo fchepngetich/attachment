@@ -12,12 +12,12 @@
             </div>
         </div>
     </div>
+    <div class="container card mt-5 mb-5">
+    <?php if (session()->getFlashdata('message')): ?>
+        <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
+    <?php endif; ?>
 
-    <div class="container mt-5">
-        <?php if (session()->getFlashdata('message')): ?>
-            <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
-        <?php endif; ?>
-
+    <div class="card-body">
         <form action="<?= base_url('admin/attachment/save-supervisor-change') ?>" method="post">
             <input type="hidden" name="attachment_id" value="<?= esc($attachment['id']) ?>">
 
@@ -32,10 +32,12 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-success">Save Changes</button>
-            <a href="<?= base_url('/admin/attachment/get') ?>" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-sm btn-primary">Save Changes</button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="history.back()">Cancel</button>
         </form>
     </div>
+</div>
+
 </div>
 
 <?= $this->section('stylesheets')?>

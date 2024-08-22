@@ -34,7 +34,7 @@ class AuthController extends BaseController
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[5]|max_length[45]',
+                'rules' => 'required|min_length[3]|max_length[45]',
                 'errors' => [
                     'required' => 'Password is required',
                     'min_length' => 'Password must be at least 5 characters long',

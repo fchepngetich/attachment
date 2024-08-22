@@ -21,6 +21,22 @@
         return $role ? $role['name'] : null;
     }
 
+    function getCourseNameById($id)
+    {
+        $courseModel = new \App\Models\Course();
+        $course = $courseModel->find($id);
+
+        return $course ? $course['name'] : null;
+    }
+
+    function getSchoolNameById($id)
+    {
+        $schoolModel = new \App\Models\School();
+        $school = $schoolModel->find($id);
+
+        return $school ? $school['name'] : null;
+    }
+
     function getUsernameById($id)
     {
         $userModel = new \App\Models\User();
