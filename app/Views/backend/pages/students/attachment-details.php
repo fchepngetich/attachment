@@ -102,25 +102,25 @@
                             </div>
                             <div class="form-group mb-3">
 
-                <a href="javascript:history.back()" class="btn btn-sm btn-info">Back</a>
-                <?php if (empty($attachmentDetails['supervisor_id'])): ?>
-                        <span>
-                            <a href="<?= base_url('admin/attachment/edit-attachment/' . esc($attachmentDetails['id'])) ?>"
-                            class="btn btn-sm btn-warning">Edit Details</a>
-                        </span>
-                    <?php endif; ?>
+                                <a href="javascript:history.back()" class="btn btn-sm btn-info">Back</a>
+                                <?php if (empty($attachmentDetails['supervisor_id'])): ?>
+                                    <span>
+                                        <a href="<?= base_url('admin/attachment/edit-attachment/' . esc($attachmentDetails['id'])) ?>"
+                                            class="btn btn-sm btn-warning">Edit Details</a>
+                                    </span>
+                                <?php endif; ?>
 
 
-            </div>
+                            </div>
                         </div>
-                        
+
                     </div>
-                    
+
                 </div>
-                
+
             </div>
 
-            
+
         <?php else: ?>
             <div class="alert alert-info">
                 <h6>You have no attachment details ,please fill the the attachment details form first</h6>

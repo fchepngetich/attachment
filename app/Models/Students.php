@@ -20,6 +20,7 @@ class Students extends Model
         'usertype',
         'course',
         'school',
+        'cohort'
     ];
     
 

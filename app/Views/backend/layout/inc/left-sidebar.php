@@ -27,6 +27,12 @@
 							<span class="micon dw dw-group"></span><span class="mtext">My Students</span>
 						</a>
 					</li>
+					<li>
+						<a href="<?= base_url('/admin/attachment/my-schedule') ?>" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-calendar"></span><span class="mtext">My Schedule</span>
+						</a>
+					</li>
+					
 					<?php if (App\Libraries\CIAuth::userType() === 'lecturer' && App\Libraries\CIAuth::role() === "1" | App\Libraries\CIAuth::role() === "2"): ?>
 
 					<li>

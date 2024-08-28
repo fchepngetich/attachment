@@ -16,6 +16,7 @@
             </div>
         </div>
     </div>
+
 <div class="col-md-12">
     <div class="card card-box">
         <div class="card-body">
@@ -46,7 +47,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+  /div>
 </div>
 
 <!-- Add/Edit Role Modal -->
@@ -99,7 +100,6 @@
 
 <script>
     $(document).ready(function() {
-        // Handle edit button click
         $('.btn-edit-role').on('click', function() {
             var roleId = $(this).data('id');
             var roleName = $(this).data('name');
@@ -111,7 +111,6 @@
             $('#role-modal').modal('show');
         });
 
-        // Handle add new role button click
         $('#btn-add-role').on('click', function() {
             $('#role-id').val('');
             $('#role-name').val('');
@@ -120,7 +119,6 @@
             $('#role-modal').modal('show');
         });
 
-        // Handle form submission
         $('#role-form').on('submit', function(e) {
             e.preventDefault();
             var form = this;
@@ -159,7 +157,6 @@
             });
         });
 
-        // Handle delete button click
         $('.delete-role-btn').on('click', function() {
             var id = $(this).data('id');
             Swal.fire({
@@ -197,4 +194,8 @@
         });
     });
 </script>
+
+
 <?= $this->endSection() ?>
+
+

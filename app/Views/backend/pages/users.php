@@ -8,7 +8,6 @@
             <div class="title">
                 <h4>Manage Lecturers</h4>
             </div>
-
         </div>
         <div class="col-md-4 col-sm-6 text-right">
     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#user-modal">
@@ -22,7 +21,31 @@
 </div>
     </div>
 </div>
-
+<div class="container">
+<div class="row mt-4 mb-3">
+    <form action="<?= base_url('admin/get-users') ?>" method="post" class="w-100">
+        <div class="form-row"> 
+            <div class="col-md-3">
+                <input type="text" name="full_name" value="<?= esc($search['full_name'] ?? '') ?>" class="form-control" placeholder="Search by Name">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="email" value="<?= esc($search['email'] ?? '') ?>" class="form-control" placeholder="Search by Email">
+            </div>
+            <div class="col-md-3">
+                <select name="role" class="form-control">
+                    <option value="">Select Role</option>
+                    <?php foreach ($roles as $role): ?>
+                        <option value="<?= esc($role['id']) ?>" <?= isset($search['role']) && $search['role'] == $role['id'] ? 'selected' : '' ?>><?= esc($role['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                <a href="<?= base_url('admin/get-users') ?>" class="btn btn-sm btn-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+</div></div>
 <div class="row">
     <div class="col-md-12">
         <div class="card card-box">

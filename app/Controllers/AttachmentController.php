@@ -278,7 +278,88 @@ public function updateAttachment()
         $attachmentModel = new attachment();
         
         $supervisor_id = CIAuth::id(); 
-        $students = $attachmentModel->where('supervisor_id', $supervisor_id)->findAll();
+    
+        // Fetch search filters from POST request
+        $search = $this->request->getPost();
+    
+        // Initialize query with default where condition
+        $query = $attachmentModel->where('supervisor_id', $supervisor_id);
+    
+        if (!empty($search['name'])) {
+            $studentIds = $studentModel->select('id')
+                                       ->like('name', $search['name'])
+                                       ->findAll();
+    
+            $studentIds = array_column($studentIds, 'id');
+            $query->whereIn('student_id', $studentIds);
+        }
+        if (!empty($search['company'])) {
+            $query->like('company_name', $search['company']);
+        }
+        if (!empty($search['county'])) {
+            $query->like('county', $search['county']);
+        }
+        if (!empty($search['start_date'])) {
+            $query->where('date_start >=', $search['start_date']);
+        }
+        if (!empty($search['end_date'])) {
+            $query->where('date_end <=', $search['end_date']);
+        }
+    
+        $students = $query->findAll();
+        
+        foreach ($students as &$student) {
+            $student['name'] = $studentModel->getStudentNameById($student['student_id']);
+        }
+    
+        $data = [
+            'full_name' => $full_name,
+            'students' => $students,
+            'search' => $search // Pass the search data to the view to retain input values
+        ];
+        
+        return view('backend/pages/students/my-students', $data);
+    }
+    
+    public function mySchedule()
+    {
+        $full_name = CIAuth::fullName();
+        $supervisor_id = CIAuth::id(); 
+    
+        $studentModel = new Students();
+        $attachmentModel = new Attachment();
+    
+        $search = $this->request->getPost(); 
+    
+        $query = $attachmentModel->where('supervisor_id', $supervisor_id)
+                                 ->where('schedule_cleared', false);
+    
+        if (!empty($search['name'])) {
+            $studentIds = $studentModel->select('id')
+                                       ->like('name', $search['name'])
+                                       ->findAll();
+    
+            $studentIds = array_column($studentIds, 'id');
+            $query->whereIn('student_id', $studentIds);
+        }
+    
+        if (!empty($search['company'])) {
+            $query->like('company_name', $search['company']);
+        }
+    
+        if (!empty($search['county'])) {
+            $query->like('county', $search['county']);
+        }
+    
+        if (!empty($search['start_date'])) {
+            $query->where('date_start >=', $search['start_date']);
+        }
+    
+        if (!empty($search['end_date'])) {
+            $query->where('date_end <=', $search['end_date']);
+        }
+    
+        $students = $query->findAll();
     
         foreach ($students as &$student) {
             $student['name'] = $studentModel->getStudentNameById($student['student_id']);
@@ -286,11 +367,13 @@ public function updateAttachment()
     
         $data = [
             'full_name' => $full_name,
-            'students' => $students
+            'students' => $students,
+            'search' => $search 
         ];
-        
-        return view('backend/pages/students/my-students', $data);
+    
+        return view('backend/pages/students/my-schedule', $data);
     }
+    
     
 
     public function assessmentForm($attachmentId)
@@ -389,7 +472,6 @@ public function updateAttachment()
         $supervisorModel = new User();
         $full_name = CIAuth::fullName();
     
-        // Get all students and supervisors to create lookup arrays
         $students = $studentModel->findAll();
         $studentLookup = [];
         foreach ($students as $student) {
@@ -402,7 +484,6 @@ public function updateAttachment()
             $supervisorLookup[$supervisor['id']] = $supervisor['full_name'];
         }
     
-        // Apply search filters to the attachment model
         if (!empty($searchData['student_name'])) {
             $studentIds = array_keys(array_filter($studentLookup, function($name) use ($searchData) {
                 return stripos($name, $searchData['student_name']) !== false;
@@ -433,10 +514,8 @@ public function updateAttachment()
             $attachmentModel->whereIn('supervisor_id', $supervisorIds);
         }
     
-        // Fetch all matching attachments
         $attachments = $attachmentModel->findAll();
     
-        // Replace IDs with names in attachments
         foreach ($attachments as &$attachment) {
             $attachment['student_name'] = $studentLookup[$attachment['student_id']] ?? 'Unknown Student';
             
@@ -447,20 +526,156 @@ public function updateAttachment()
             }
         }
     
-        // Prepare data for view
         $data = [
             'attachments' => $attachments,
             'searchData' => $searchData,
             'full_name' => $full_name,
         ];
     
-        // Return the view with the data
         return view('backend/pages/students/student-list', $data);
     }
     
+    public function scheduleVisit()
+    {
+        $attachmentModel = new Attachment();
+        $email = \Config\Services::email();
     
+        $supervisor_id = CIAuth::id();
+        $student_id = $this->request->getPost('student_id');
+        $visit_date = $this->request->getPost('visit_date');
+        $visit_time = $this->request->getPost('visit_time');
     
+        $visit_scheduled_at = $visit_date . ' ' . $visit_time;
     
+        $attachment = $attachmentModel->where('student_id', $student_id)
+                                      ->where('supervisor_id', $supervisor_id)
+                                      ->first();
+    
+        if ($attachment) {
+            $attachmentModel->update($attachment['id'], [
+                'visit_scheduled_at' => $visit_scheduled_at,
+                'visit_status' => 'scheduled'
+            ]);
+    
+            $student_email = $this->getStudentEmailById($student_id); 
+            $this->sendEmailNotification($student_email, $visit_scheduled_at);
+    
+            return redirect()->back()->with('message', 'Visit scheduled successfully and notification sent.');
+        } else {
+            return redirect()->back()->with('error', 'Attachment record not found.');
+        }
+    }
+    
+
+    private function sendEmailNotification($toEmail, $visit_date)
+    {
+        $email = \Config\Services::email();
+        $email->setTo($toEmail);
+        $email->setFrom('no-reply@example.com', 'Attachment Portal');
+        $email->setSubject('Scheduled Visit Notification');
+        $email->setMessage('A new visit has been scheduled for you on ' . $visit_date . '. Please be prepared.');
+
+        if (!$email->send()) {
+            log_message('error', 'Failed to send email: ' . $email->printDebugger(['headers']));
+        }
+    }
+
+    private function getStudentEmailById($student_id)
+    {
+        $studentModel = new Students();
+        $student = $studentModel->find($student_id);
+        return $student ? $student['email'] : null;
+    }
+
+    public function saveSchedule()
+    {
+        $studentId = $this->request->getPost('student_id');
+        $visitDate = $this->request->getPost('visit_date');
+        $visitTime = $this->request->getPost('visit_time');
+        $attachmentModel = new Attachment();
+    
+        $visitScheduledAt = $visitDate . ' ' . $visitTime;
+    
+        $existingSchedule = $attachmentModel->where('student_id', $studentId)->first();
+    
+        if ($existingSchedule) {
+            $attachmentModel->update($existingSchedule['id'], [
+                'visit_scheduled_at' => $visitScheduledAt
+                
+            ]);
+    
+            session()->setFlashdata('message', 'Schedule updated successfully!');
+        } 
+    
+        $this->sendScheduleNotification($studentId, $visitScheduledAt);
+    
+        return redirect()->to(base_url('admin/attachment/my-schedule'));
+    }
+    
+private function sendScheduleNotification($studentId, $visitScheduledAt)
+{
+    $studentModel = new Students();
+    $student = $studentModel->find($studentId);
+    $email = \Config\Services::email();
+
+    $email->setTo($student['email']);
+    $email->setSubject('Visit Schedule Notification');
+    $email->setMessage("
+        Dear {$student['name']},
+
+        Your visit has been scheduled on {$$visitScheduledAt}
+        
+        Thank you,
+        Supervisor Team
+    ");
+
+    $email->send();
+}
+
+public function clearSchedule($studentId)
+{
+    $attachmentModel = new Attachment();
+
+    try {
+       
+        $updateStatus = $attachmentModel->where('student_id', $studentId)
+                                        ->set(['schedule_cleared' => true])
+                                        ->update();
+ 
+        if ($updateStatus) {
+            session()->setFlashdata('message', 'Schedule cleared successfully.');
+        } else {
+            $db = \Config\Database::connect();
+            $error = $db->error();
+            log_message('error', 'Failed to clear schedule. Error: ' . json_encode($error));
+            
+            session()->setFlashdata('error', 'Failed to clear the schedule. Please try again.');
+        }
+
+    } catch (\Exception $e) {
+       
+        log_message('error', $e->getMessage());
+        session()->setFlashdata('error', 'An error occurred while clearing the schedule.');
+    }
+
+    return redirect()->to(base_url('admin/attachment/my-schedule'));
+}
+
+public function details($studentId)
+    {
+        $full_name = CIAuth::fullName();
+
+        $attachmentModel = new Attachment();
+        $attachments = $attachmentModel->getAttachmentsByStudentId($studentId);
+
+        return view('backend/pages/students/single-student-attachment_details', ['attachments' => $attachments,'full_name' => $full_name]);
+    }
+
 
 
 }
+    
+    
+
+
+

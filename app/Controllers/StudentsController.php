@@ -316,15 +316,11 @@ class StudentsController extends BaseController
     }
 
 
-
- 
-
     public function viewStudentDetails($id)
     {
         $studentsModel = new Students();
         $fullName = CIAuth::fullName();
 
-        // Get student information
         $student = $studentsModel->getStudentById($id);
 
         $course = $studentsModel->getCourseById($student['course']);

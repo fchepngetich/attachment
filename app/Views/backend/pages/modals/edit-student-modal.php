@@ -17,6 +17,26 @@
                 <input type="hidden" id="edit-student-id" name="id">
 
                 <div class="form-group">
+                    <label for="cohort"><b>Cohort</b></label>
+                    <select name="cohort" id="edit-cohort" class="form-control" required>
+                        <option value="">Select Cohort</option>
+
+                        <?php
+                        $currentYear = date('Y');
+                        $cohorts = [
+                            "January-April $currentYear",
+                            "May-August $currentYear",
+                            "September-December $currentYear"
+                        ];
+                        foreach ($cohorts as $cohort) {
+                            echo "<option value=\"$cohort\">$cohort</option>";
+                        }
+                        ?>
+                    </select>
+                    <span class="alert error cohort_error"></span>
+                </div>
+
+                <div class="form-group">
                     <label for="edit-name"><b>Full Name</b></label>
                     <input type="text" id="edit-name" name="name" class="form-control" required placeholder="Enter full name">
                     <span class="alert error name_error"></span>

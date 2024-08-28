@@ -74,14 +74,14 @@
     </form>
 
     </div>
-         <div class="col-md-6 login-box">
+         <div style="border-left:1px solid #202342" class="col-md-6 login-box">
             <h4>Password Requirements</h4>
             <ul>
-                <li>At least 8 characters long</li>
-                <li>At least one uppercase letter</li>
-                <li>At least one lowercase letter</li>
-                <li>At least one number</li>
-                <li>At least one special character</li>
+                <li>1. At least 8 characters long</li>
+                <li>2. At least one uppercase letter</li>
+                <li>3. At least one lowercase letter</li>
+                <li>4. At least one number</li>
+                <li>5. At least one special character</li>
             </ul>
         </div>
 

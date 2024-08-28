@@ -54,18 +54,40 @@ class AdminController extends BaseController
     }
 
     public function getUsers()
-    {
-        $db = \Config\Database::connect();
-        $full_name = CIAuth::fullName();
-        $roleModel = new Roles();
-        $roles = $roleModel->findAll();
+{
+    $db = \Config\Database::connect();
+    $full_name = CIAuth::fullName();
+    $roleModel = new Roles();
+    $roles = $roleModel->findAll();
 
-        $userModel = new User();
-        $data['full_name'] = $full_name;
-        $data['roles'] = $roles;
-        $data['users'] = $userModel->findAll();
-        return view('backend/pages/users', $data);
+    $userModel = new User();
+    
+    $search = $this->request->getPost();
+
+    $query = $userModel;
+
+    if (!empty($search['full_name'])) {
+        $query->like('full_name', $search['full_name']);
     }
+    if (!empty($search['email'])) {
+        $query->like('email', $search['email']);
+    }
+    if (!empty($search['role'])) {
+        $query->where('role_id', $search['role']);
+    }
+
+    $users = $query->findAll();
+
+    $data = [
+        'full_name' => $full_name,
+        'roles' => $roles,
+        'users' => $users,
+        'search' => $search 
+    ];
+
+    return view('backend/pages/users', $data);
+}
+
 
     public function addUser()
     {
@@ -234,7 +256,6 @@ class AdminController extends BaseController
         if ($request->isAJAX()) {
             $validation = \Config\Services::validation();
     
-            // Validation rules (already correctly set up)
             $validation->setRules([
                 'name' => [
                     'rules' => 'required|string|max_length[255]',
@@ -284,9 +305,14 @@ class AdminController extends BaseController
                         'required' => 'Course is required',
                     ]
                 ],
+                'cohort' => [
+                    'rules' => 'required|string|max_length[100]',
+                    'errors' => [
+                        'required' => 'Cohort is required',
+                    ]
+                ],
             ]);
     
-            // Validation check
             if (!$validation->withRequest($this->request)->run()) {
                 $errors = $validation->getErrors();
                 return $this->response->setJSON([
@@ -297,11 +323,9 @@ class AdminController extends BaseController
             } else {
                 $studentModel = new Students();
     
-                // Hash the registration number as the password
                 $regNo = $this->request->getPost('reg_no');
                 $hashedPassword = password_hash($regNo, PASSWORD_DEFAULT);
     
-                // Prepare the data array for saving
                 $data = [
                     'name' => $this->request->getPost('name'),
                     'email' => $this->request->getPost('email'),
@@ -313,11 +337,11 @@ class AdminController extends BaseController
                     'usertype' => 'student',
                     'school_id' => $this->request->getPost('school'),
                     'course' => $this->request->getPost('course'),
+                    'cohort' => $this->request->getPost('cohort'), 
+
                 ];
     
-                // Save the data and handle response
                 if ($studentModel->save($data)) {
-                    // Send welcome email
                     $email = \Config\Services::email();
                     $email->setTo($data['email']);
                     $email->setSubject('Welcome to the System');
@@ -482,6 +506,7 @@ class AdminController extends BaseController
             'reg_no' => $this->request->getPost('reg_no'),
             'school' => $this->request->getPost('school'),
             'course' => $this->request->getPost('course'),
+            'cohort' => $this->request->getPost('cohort'),
         ];
     
         $emailInUse = $studentModel->where('email', $newData['email'])
@@ -521,7 +546,8 @@ class AdminController extends BaseController
             return $this->response->setJSON(['status' => 0, 'msg' => 'Failed to update student. ' . $e->getMessage()]);
         }
     }
-    
+
+
     public function deleteStudent()
     {
         $studentModel = new Students();
@@ -934,7 +960,8 @@ class AdminController extends BaseController
                     !empty($student['semester']) &&
                     !empty($student['reg_no']) &&
                     !empty($student['school']) &&
-                    !empty($student['course'])
+                    !empty($student['course']) &&
+                    !empty($student['cohort'])
                 ) {
                     $data = [
                         'name' => $student['name'],
@@ -945,6 +972,7 @@ class AdminController extends BaseController
                         'reg_no' => $student['reg_no'],
                         'school' => $schoolLookup[$student['school']] ?? null,
                         'course' => $courseLookup[$student['course']] ?? null,
+                        'cohort' => $student['cohort'],
                         'password' => password_hash($student['reg_no'], PASSWORD_BCRYPT),
                     ];
     
@@ -986,6 +1014,8 @@ class AdminController extends BaseController
                         'reg_no' => $data[5] ?? null,
                         'school' => $data[6] ?? null,
                         'course' => $data[7] ?? null,
+                        'cohort' => $data[8] ?? null,
+
                     ];
                 }
             }

@@ -76,7 +76,7 @@ body,html{-webkit-font-smoothing:antialiased;width:100%;height:100%}html{-webkit
 color: #fff !important;
 }
 
-#attachmentsTable_filter,#students-table_filter{display: none;}
+#studentsTable_filter,#attachmentsTable_filter,#students-table_filter{display: none;}
 .dataTables_length{display: none;}
 
 .position-relative {

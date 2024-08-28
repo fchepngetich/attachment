@@ -13,7 +13,7 @@
 </div>
 
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="profile-box bg-white box-shadow border-radius-10 p-4">
                 <div class="profile-content">
                     <div class="row">

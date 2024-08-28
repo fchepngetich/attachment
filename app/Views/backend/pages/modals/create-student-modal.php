@@ -17,6 +17,27 @@
                 <?= csrf_field() ?>
 
                 <div class="form-group">
+                    <label for="cohort"><b>Cohort</b></label>
+                    <select name="cohort" class="form-control" required>
+                        <option value="">Select Cohort</option>
+
+                        <?php
+                        $currentYear = date('Y');
+                        $cohorts = [
+                            "January-April $currentYear",
+                            "May-August $currentYear",
+                            "September-December $currentYear"
+                        ];
+                        foreach ($cohorts as $cohort) {
+                            echo "<option value=\"$cohort\">$cohort</option>";
+                        }
+                        ?>
+                    </select>
+                    <span class="alert error cohort_error"></span>
+                </div>
+
+
+                <div class="form-group">
                     <label for="name"><b>Full Name</b></label>
                     <input type="text" name="name" class="form-control" required placeholder="Enter full name">
                     <span class="alert error name_error"></span>
@@ -55,7 +76,8 @@
 
                 <div class="form-group">
                     <label for="reg_no"><b>Registration Number</b></label>
-                    <input type="text" name="reg_no" class="form-control" required placeholder="Enter registration number">
+                    <input type="text" name="reg_no" class="form-control" required
+                        placeholder="Enter registration number">
                     <span class="alert error reg_no_error"></span>
                 </div>
 
@@ -69,7 +91,7 @@
                     </select>
                     <span class="alert error school_error"></span>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="course"><b>Course</b></label>
                     <select name="course" id="course" class="form-control" required>
@@ -89,4 +111,3 @@
         </form>
     </div>
 </div>
-

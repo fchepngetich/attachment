@@ -133,7 +133,6 @@
 
         <!-- Add Student Modal -->
         <?php include 'modals/create-student-modal.php' ?>
-        <!-- Edit Student Modal -->
         <?php include 'modals/edit-student-modal.php' ?>
         <?php include 'modals/batch_students_modal.php' ?>
 
@@ -211,7 +210,6 @@
 
     $('#students-table').DataTable();
 
-    // Delegate event for dynamically created buttons
     $('#students-table').on('click', '.edit-student-btn', function () {
         var studentId = $(this).data('id');
         $.ajax({
@@ -230,6 +228,7 @@
                     $('#edit-reg_no').val(response.data.reg_no);
                     $('#edit-school').val(response.data.school);
                     $('#edit-course').val(response.data.course);
+                    $('#edit-cohort').val(response.data.cohort);
                     $('#edit-student-modal').modal('show');
                 } else {
                     toastr.error('Failed to fetch student data.');
@@ -242,7 +241,6 @@
         });
     });
 
-    // Delegate event for dynamically created delete buttons
     $('#students-table').on('click', '.delete-student-btn', function () {
         var studentId = $(this).data('id');
         Swal.fire({

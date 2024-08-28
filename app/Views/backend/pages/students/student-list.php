@@ -93,7 +93,8 @@
                                 <?php if ($attachment['supervisor_id'] && !$attachment['supervisor_comments']) : ?>
                                     <a href="<?= base_url('admin/attachment/change-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Change Supervisor</a>
                                 <?php elseif($attachment['supervisor_id'] && $attachment['supervisor_comments']): ?>
-                                    <a href="<?= base_url('admin/attachment/view/' . $attachment['id']) ?>" class="btn btn-primary btn-sm">Attachment Details</a>
+                                    <a href="<?= base_url('admin/attachment/view/' . $attachment['id']) ?>" class="btn btn-primary btn-sm">
+                                        Attachment Details</a>
                                 <?php endif; ?>
                                 <?php if (!$attachment['supervisor_id']) : ?>
                                     <a href="<?= base_url('admin/attachment/assign-supervisor/' . $attachment['id']) ?>" class="btn btn-warning btn-sm">Assign Supervisor</a>

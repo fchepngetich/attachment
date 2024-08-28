@@ -14,7 +14,9 @@ $routes->group('admin', static function ($routes) {
 
         $routes->get('attachmentlist', 'StudentsController::studentsHome');
         $routes->get('logout', 'AdminController::logoutHandler');
-        $routes->post('get-users', 'AdminController::getUser', ['as' => 'admin.users.get']);
+        // $routes->post('get-users', 'AdminController::getUser', ['as' => 'admin.users.get']);
+        // $routes->get('get-users', 'AdminController::getUser', ['as' => 'admin.users.get']);
+        $routes->post('get-users', 'AdminController::getUsers', ['as' => 'get-users']);
         $routes->get('get-users', 'AdminController::getUsers', ['as' => 'get-users']);
         $routes->get('user/edit', 'AdminController::edit', ['as' => 'user.edit']);
         $routes->post('user/update', 'AdminController::update', ['as' => 'user.update']);
@@ -80,13 +82,19 @@ $routes->group('admin', static function ($routes) {
         $routes->post('update-attachment', 'AttachmentController::updateAttachment');
         $routes->get('my-students', 'AttachmentController::students');
         $routes->post('my-students', 'AttachmentController::students');
+        $routes->get('my-schedule', 'AttachmentController::mySchedule');
+        $routes->post('my-schedule', 'AttachmentController::mySchedule');
+
 
         $routes->get('assessment-form/(:num)', 'AttachmentController::assessmentForm/$1');
         $routes->post('confirm-assessment', 'AttachmentController::confirmAssessment');
         $routes->get('view/(:num)', 'AttachmentController::view/$1');
         $routes->post('search-attached-students', 'AttachmentController::searchAttachedStudents');
-
-
+        $routes->post('schedule-visit', 'AttachmentController::scheduleVisit');
+        $routes->post('schedule/save', 'AttachmentController::saveSchedule');
+        $routes->post('clear-schedule/(:num)', 'AttachmentController::clearSchedule/$1');
+        $routes->get('clear-schedule/(:num)', 'AttachmentController::clearSchedule/$1');
+        $routes->get('details/(:num)', 'AttachmentController::details/$1');
 
 
     });

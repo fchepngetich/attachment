@@ -58,57 +58,80 @@
 </div>
 <?= $this->endSection() ?>
 
-<?= $this->section('stylesheets') ?>
+<?= $this->section('stylesheets')?>
+<link rel="stylesheet" href="/backend/src/plugins/datatables/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/backend/src/plugins/datatables/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-<?= $this->endSection() ?>
+<link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.min.css">
+<link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.structure.min.css">
+<link rel="stylesheet" href="/extra-assets/jquery-ui-1.13.3/jquery-ui.theme.min.css">
+<?= $this->endSection()?>
 
 <?= $this->section('scripts') ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+<script src="/backend/src/plugins/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/backend/src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
+<script src="/backend/src/plugins/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/backend/src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="/extra-assets/jquery-ui-1.13.3/jquery-ui.min.js"></script>
 <script>
- $(document).ready(function() {
+$(document).ready(function() {
+    // Initialize DataTables
+    $('#courses-table').DataTable({
+        paging: true, 
+        searching: true, 
+        ordering: true, 
+        lengthChange: true, 
+        responsive: true, 
+        autoWidth: false, 
+    });
+
+    // Show modal for adding a new course
     $('#add-course-btn').on('click', function() {
         $('#create-course-modal').modal('show');
     });
+
+    // Handle add course form submission
     $('#add-course-form').on('submit', function(e) {
-    e.preventDefault();
-    var form = this;
-    var formData = new FormData(form);
+        e.preventDefault();
+        var form = this;
+        var formData = new FormData(form);
 
-    $.ajax({
-        url: $(form).attr('action'),
-        method: $(form).attr('method'),
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: 'json',
-        beforeSend: function() {
-            toastr.remove();
-            $(form).find('span.error-text').text('');
-        },
-        success: function(response) {
-            if (response.status === 1) {
-                $(form)[0].reset();
-                $('#create-course-modal').modal('hide');
-                toastr.success(response.msg);
-                location.reload();
-            } else {
-                if (response.errors) {
-                    $.each(response.errors, function(prefix, val) {
-                        $(form).find('span.' + prefix + '_error').text(val);
-                    });
+        $.ajax({
+            url: $(form).attr('action'),
+            method: $(form).attr('method'),
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            beforeSend: function() {
+                toastr.remove();
+                $(form).find('span.error-text').text('');
+            },
+            success: function(response) {
+                if (response.status === 1) {
+                    $(form)[0].reset();
+                    $('#create-course-modal').modal('hide');
+                    toastr.success(response.msg);
+                    location.reload(); // Consider using DataTables API to refresh
                 } else {
-                    toastr.error(response.msg);
+                    if (response.errors) {
+                        $.each(response.errors, function(prefix, val) {
+                            $(form).find('span.' + prefix + '_error').text(val);
+                        });
+                    } else {
+                        toastr.error(response.msg);
+                    }
                 }
+            },
+            error: function(xhr, status, error) {
+                toastr.error('An error occurred. Please try again.');
             }
-        },
-        error: function(xhr, status, error) {
-            toastr.error('An error occurred. Please try again.');
-        }
+        });
     });
-});
 
+    // Show edit modal and handle course editing
     $('.edit-course-btn').on('click', function() {
-        
         var courseId = $(this).data('id');
         $.ajax({
             url: '<?= base_url('admin/courses/edit') ?>',
@@ -120,21 +143,19 @@
             dataType: 'json',
             success: function(response) {
                 if (response.status === 1) {
-                    location.reload();
+                    location.reload(); // Update this to dynamically change the UI
                 } else {
                     toastr.error(response.msg || 'Failed to fetch course data.');
                 }
             },
             error: function(xhr, status, error) {
-            console.log(xhr.responseText); // Log the error message
-            toastr.error('An error occurred. Please try again.');
-            }
-
-            
+                console.log(xhr.responseText); // Log the error message
+                toastr.error('An error occurred. Please try again.');
             }
         });
     });
 
+    // Handle edit course form submission
     $('#edit-course-form').on('submit', function(e) {
         e.preventDefault();
         var form = this;
@@ -172,7 +193,6 @@
     });
 
     // Delete Course
-
     $('.delete-course-btn').on('click', function() {
         var courseId = $(this).data('id');
         Swal.fire({
@@ -217,6 +237,7 @@
         });
     });
 });
+
 
 
 
