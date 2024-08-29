@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use App\Libraries\CIAuth;
 use App\Libraries\Hash;
 use App\Models\User;
+use App\Models\Logs;
 
 class AuthController extends BaseController
 {
@@ -21,6 +22,10 @@ class AuthController extends BaseController
         ];
         return view('backend/pages/auth/login', $data);
     }
+    
+    
+    
+
     public function loginHandler()
     {
         $loginId = $this->request->getVar('login_id');
@@ -71,7 +76,12 @@ class AuthController extends BaseController
                 return redirect()->to(base_url('admin/login'))->with('fail', 'Wrong password')->withInput();
             } else {
                 CIAuth::CIAuth($userInfo);
-    
+                $logModel = new Logs();
+                $logModel->save([
+                    'user_id' =>CIAuth::id(),
+                    'action' => 'User Logged in',
+                    'details' => 'User Logged in Success'
+                ]);
                 if ($userInfo['password_reset_required'] == 0) {
                     return redirect()->to(base_url('admin/change-password'))->with('info', 'Please change your password on first login.');
                 }
@@ -85,55 +95,6 @@ class AuthController extends BaseController
         }
     }
     
-    
-//  public function loginHandler()
-// {
-//     $fieldType = filter_var($this->request->getVar('login_id'), FILTER_VALIDATE_EMAIL) ? 'email' : 'full_name';
-
-//     $validationRules = [
-//         'login_id' => [
-//             'rules' => 'required|is_not_unique[users.' . $fieldType . ']',
-//             'errors' => [
-//                 'required' => ($fieldType == 'email') ? 'Email is required' : 'Full Name is required',
-//                 'is_not_unique' => ($fieldType == 'email') ? 'Email does not exist in the system' : 'Full Name does not exist in the system',
-//             ]
-//         ],
-//         'password' => [
-//             'rules' => 'required|min_length[5]|max_length[45]',
-//             'errors' => [
-//                 'required' => 'Password is required',
-//                 'min_length' => 'Password must be at least 5 characters long',
-//                 'max_length' => 'Password must not be longer than 45 characters',
-//             ]
-//         ]
-//     ];
-
-//     if (!$this->validate($validationRules)) {
-//         return view('backend/pages/auth/login', [
-//             'pageTitle' => 'Login',
-//             'validation' => $this->validator
-//         ]);
-//     } else {
-//         $user = new User();
-//         $userInfo = $user->where($fieldType, $this->request->getVar('login_id'))->first();
-
-//         $check_password = HASH::check($this->request->getVar('password'), $userInfo['password']);
-//         if (!$check_password) {
-//             return redirect()->to(base_url('admin/login'))->with('fail', 'Wrong password')->withInput();
-//         } else {
-//             CIAuth::CIAuth($userInfo);
-
-//             if ($userInfo['password_reset_required']) {
-//                 return redirect()->to(base_url('admin/change-password'))->with('info', 'Please change your password on first login.');
-//             }
-
-//             return redirect()->to(base_url('admin/home'));
-//         }
-//     }
-// }
-
-
-
     public function forgotPassword()
     {
         $data = array(

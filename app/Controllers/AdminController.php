@@ -10,7 +10,7 @@ use App\Models\Roles;
 use App\Models\Students;
 use App\Models\School;
 use App\Models\Course;
-
+use App\Models\Logs;
 
 
 use \Mberecall\CI_Slugify\SlugService;
@@ -49,9 +49,27 @@ class AdminController extends BaseController
 
     public function logoutHandler()
     {
+        $userId = CIAuth::id();
+    
+        $userModel = new User();
+        $currentUser = $userModel->find($userId);
+    
+        $userName = $currentUser ? $currentUser['full_name'] : 'Unknown User';
+    
+        $logModel = new Logs();
+        $logModel->save([
+            'user_id' => $userId,
+            'action' => 'User Logged out',
+            'details' => sprintf('User %s logged out.', esc($userName))
+        ]);
+    
+        // Clear the user's session or authentication details
         CIAuth::forget();
+    
+        // Redirect to the login page with a success message
         return redirect()->to(base_url('admin/login'))->with('success', 'You are logged out');
     }
+    
 
     public function getUsers()
 {
@@ -639,34 +657,36 @@ class AdminController extends BaseController
     public function update()
     {
         $userModel = new User();
+        $roleModel = new Roles();
         $userId = $this->request->getPost('user_id');
         $roleId = (int) $this->request->getPost('role_id');
 
-
-        // Fetch current user data before update
+       
         $currentUser = $userModel->find($userId);
+        $currentRoleName = $roleModel->find($currentUser['role_id'])['name'] ?? 'Unknown';
+        $newRoleName = $roleModel->find($roleId)['name'] ?? 'Unknown';
         if (!$currentUser) {
             return $this->response->setJSON(['status' => 0, 'msg' => 'User not found.']);
         }
 
-        // New data from form submission
         $newData = [
             'full_name' => $this->request->getPost('full_name'),
             'email' => $this->request->getPost('email'),
             'role_id' => $roleId,
         ];
 
-        // Compare old and new data
         $changes = [];
         foreach ($newData as $field => $value) {
-            if ($currentUser[$field] != $value) {
+            if ($field == 'role_id') {
+                if ($currentUser[$field] != $value) {
+                    $changes[] = "role: '{$currentRoleName}' to '{$newRoleName}'";
+                }
+            } elseif ($currentUser[$field] != $value) {
                 $changes[] = "{$field}: '{$currentUser[$field]}' to '{$value}'";
             }
         }
 
-        // Perform the update
         if ($userModel->update($userId, $newData)) {
-            // Retrieve current user's full name for logging
             $loggedInUserName = \App\Libraries\CIAuth::id();
 
             $username = getUsernameById($userId);

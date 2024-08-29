@@ -278,28 +278,36 @@ class StudentsController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Failed to create attachment');
         }
     }
-
-    public function confirmAssessmentByStudent($attachmentId)
+    public function confirmAssessmentByStudent()
     {
+        // Load helper and models
+        helper(['form']);
         $attachmentModel = new Attachment();
-        $attachment = $attachmentModel->find($attachmentId);
 
-        if (!$attachment) {
-            return redirect()->to(base_url('admin/attachment/attachment-details'))->with('error', 'Invalid Attachment ID');
+        // Get POST data
+        $attachmentId = $this->request->getPost('attachment_id');
+        $signature = $this->request->getPost('signature');
+        $comments = $this->request->getPost('comments');
+
+        // Validate input
+        if (empty($attachmentId) || empty($signature)) {
+            return redirect()->back()->with('error', 'Attachment ID and signature are required.');
         }
 
-        $studentId = CIAuth::id();
-        if ($attachment['student_id'] != $studentId) {
-            return redirect()->to(base_url('admin/attachment/attachment-details'))->with('error', 'You are not authorized to confirm this assessment');
+        // Update the database with the signature
+        $updateData = [
+            'is_student_confirmed' => 1,
+            'student_signature' => $signature, // Assuming the column name is 'student_signature'
+            'comments' => $comments
+        ];
+
+        if ($attachmentModel->update($attachmentId, $updateData)) {
+            return redirect()->back()->with('success', 'Assessment confirmed successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to confirm assessment.');
         }
-
-        $attachmentModel->update($attachmentId, [
-            'is_student_confirmed' => true,
-            'confirmation_date' => date('Y-m-d H:i:s')
-        ]);
-
-        return redirect()->to(base_url('admin/attachment/attachment-details'))->with('message', 'Assessment confirmed successfully');
     }
+    
 
     public function newgetCoursesBySchool()
     {
@@ -335,9 +343,4 @@ class StudentsController extends BaseController
 
         return view('backend/pages/students/student-details', $data);
     }
-
-    
-
-
-
 }

@@ -11,7 +11,6 @@ $routes->group('admin', static function ($routes) {
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
         $routes->get('home', 'StudentsController::index', ['as' => 'admin.home']);
         $routes->post('home', 'StudentsController::index', ['as' => 'admin.home']);
-
         $routes->get('attachmentlist', 'StudentsController::studentsHome');
         $routes->get('logout', 'AdminController::logoutHandler');
         // $routes->post('get-users', 'AdminController::getUser', ['as' => 'admin.users.get']);
@@ -38,6 +37,7 @@ $routes->group('admin', static function ($routes) {
         // $routes->get('assign-supervisor/(:num)', 'StudentController::assignSupervisor/$1');
         // $routes->post('assign-supervisor/save', 'StudentController::saveAssignment');
         $routes->get('confirm-assessment/(:num)', 'StudentsController::confirmAssessmentByStudent/$1');
+        $routes->post('confirm-assessment', 'AttachmentController::confirmAssessmentByStudent');
         $routes->post('create-student', 'AdminController::createStudent');
         $routes->get('edit', 'AdminController::editStudent');
         $routes->post('delete', 'AdminController::deleteStudent');
@@ -47,8 +47,6 @@ $routes->group('admin', static function ($routes) {
         $routes->get('new-get-courses-by-school', 'StudentsController::newgetCoursesBySchool');
         $routes->post('search', 'AdminController::search');
         $routes->get('details/(:num)', 'StudentsController::viewStudentDetails/$1');
-
-
 
     });
     $routes->group('', ['filter' => 'cifilter:auth'], static function ($routes) {
