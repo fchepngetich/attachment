@@ -41,6 +41,14 @@
                             <label class="font-weight-bold">Semester:</label>
                             <p class="text-muted"><?= esc($user['semester']) ?></p>
                         </div>
+                        <div class="col-md-4 profile-item mb-2">
+                            <label class="font-weight-bold">School:</label>
+                            <p class="text-muted"><?= esc(getSchoolNameById($user['school'])) ?></p>
+                        </div>
+                        <div class="col-md-4 profile-item mb-2">
+                            <label class="font-weight-bold">Course:</label>
+                            <p class="text-muted"><?= esc(getCourseNameById($user['course'])) ?></p>
+                        </div>
                     </div>
                 </div>
             </div>

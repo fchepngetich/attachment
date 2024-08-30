@@ -26,6 +26,7 @@
             <div class="form-group">
                 <label for="county">County</label>
                 <select class="form-control" id="county" name="county" required>
+                <option value="" selected disabled>Select County</option>
                     <?php foreach ($counties as $code => $name): ?>
                         <option value="<?= $code ?>"><?= $name ?></option>
                     <?php endforeach; ?>
@@ -35,7 +36,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label for="company_location">Company Location</label>
-                <input type="text" class="form-control" id="company_location" name="company_location">
+                <input type="text" class="form-control" placeholder="eg bulidings,roods,room numbers" id="company_location" name="company_location">
             </div>
         </div>
      
@@ -57,19 +58,22 @@
                 <input type="date" class="form-control" id="date_start" name="date_start" required>
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="form-group">
                 <label for="date_end">End Date</label>
                 <input type="date" class="form-control" id="date_end" name="date_end" required>
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="form-group">
-                <label for="google_map">Google Map URL</label>
-                <input type="text" class="form-control" id="google_map" name="google_map">
+                <label for="google_map">Google Map link</label>
+                <input type="text" class="form-control" placeholder="share the google map link" id="google_map" name="google_map">
             </div>
         </div>
     </div>
+    
     <div class="form-group">
         <button type="submit" class="btn btn-sm btn-primary">Submit</button>
         <a href="javascript:history.back()" class="btn btn-sm btn-secondary ml-2">Cancel</a>
@@ -77,7 +81,6 @@
 </form>
 
 </div>
-
 
 <?= $this->endSection() ?>
 

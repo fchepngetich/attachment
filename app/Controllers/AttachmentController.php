@@ -419,64 +419,60 @@ class AttachmentController extends BaseController
 
         return view('backend/pages/students/confirm_assessment_form', $data);
     }
-
-    public function confirmAssessment()
+    public function confirmAssessmentByStudent()
     {
+        // Get form data
         $attachmentId = $this->request->getPost('attachment_id');
         $comments = $this->request->getPost('comments');
-        $userId = CIAuth::id();
-
-        $attachmentModel = new Attachment();
-        $logModel = new Logs();
-        $studentModel = new Students();
-
-        // Fetch the attachment details using the attachment ID
-    $attachment = $attachmentModel->find($attachmentId);
-
-    // Retrieve the student ID from the attachment data
-    $studentId = $attachment['student_id'];
-
-    // Fetch the student's details using the student ID
-    $student = $studentModel->find($studentId);
-    $studentName = $student ? $student['name'] : 'Unknown Student';
-
+        $signature = $this->request->getPost('signature');
     
-        $attachmentModel->update(
-            $attachmentId,
-            ['is_assessment_confirmed' => true, 'supervisor_comments' => $comments, 'assessment_confirmed_at' => date('Y-m-d H:i:s')]
-        );
-      
-  
-        $logModel->save([
-            'action' => sprintf(
-                'Assessment confirmed for student %s',
-                esc($studentName)
-            ),
-            'user_id' => $userId,
-            'attachment_id' => $attachmentId,
-            'supervisor_id' => $userId
+        // Load the Attachment model
+        $attachmentModel = new Attachment();
+    
+        // Fetch attachment details
+        $attachment = $attachmentModel->find($attachmentId);
+    
+        // Validate the attachment
+        if (!$attachment) {
+            return redirect()->to(base_url('admin/attachment/attachment-details'))->with('error', 'Invalid Attachment ID');
+        }
+    
+        // Check if the student is authorized to confirm this assessment
+        $studentId = CIAuth::id();
+        if ($attachment['student_id'] != $studentId) {
+            return redirect()->to(base_url('admin/attachment/attachment-details'))->with('error', 'You are not authorized to confirm this assessment');
+        }
+    
+        // Decode the Base64 signature and save it as an image file
+        if (!empty($signature)) {
+            $signatureData = explode(',', $signature);
+            $decodedSignature = base64_decode(end($signatureData));
+    
+            // Define the file path to save the signature image
+            $signatureFileName = WRITEPATH . 'uploads/signatures/' . $attachmentId . '.png';
+    
+            // Save the decoded signature as a PNG file
+            if (file_put_contents($signatureFileName, $decodedSignature) === false) {
+                return redirect()->back()->with('error', 'Failed to save signature.');
+            }
+    
+            // Prepare the file path to store in the database
+            $signaturePath = 'uploads/signatures/' . $attachmentId . '.png';
+        } else {
+            $signaturePath = null; // or handle the case where signature is not provided
+        }
+    
+        // Update attachment data
+        $attachmentModel->update($attachmentId, [
+            'is_student_confirmed' => true,
+            'confirmation_date' => date('Y-m-d H:i:s'),
+            'student_comments' => $comments,
+            'student_signature' => $signaturePath // Store the path to the image file
         ]);
-
-        return redirect()->to(base_url('admin/attachment/my-students'))->with('message', 'Assessment confirmed successfully');
+    
+        // Redirect with a success message
+        return redirect()->to(base_url('admin/attachment/attachment-details'))->with('message', 'Assessment confirmed successfully');
     }
-
-    // public function view($id)
-//     {
-//         $attachmentModel = new Attachment();
-//         $attachment = $attachmentModel->find($id);
-//         $full_name = CIAuth::fullName();
-
-    //         if (!$attachment) {
-//             return redirect()->to(base_url('admin/attachment/get'))->with('error', 'Attachment not found');
-//         }
-
-    //         return view('backend/pages/students/view-attach-details.php', [
-//             'attachment' => $attachment,
-//           'full_name' => $full_name,
-
-    //         ]);
-//     }
-
     public function view($id)
     {
         $full_name = CIAuth::fullName();

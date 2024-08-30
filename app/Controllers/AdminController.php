@@ -50,25 +50,27 @@ class AdminController extends BaseController
     public function logoutHandler()
     {
         $userId = CIAuth::id();
-    
+        
         $userModel = new User();
         $currentUser = $userModel->find($userId);
+        
+        
+        if ($currentUser && $currentUser['usertype'] !== 'student') {
+            $userName = $currentUser['full_name'] ?? 'Unknown User';
     
-        $userName = $currentUser ? $currentUser['full_name'] : 'Unknown User';
+            $logModel = new Logs();
+            $logModel->save([
+                'user_id' => $userId,
+                'action' => 'User Logged out',
+                'details' => sprintf('User %s logged out.', esc($userName))
+            ]);
+        }
     
-        $logModel = new Logs();
-        $logModel->save([
-            'user_id' => $userId,
-            'action' => 'User Logged out',
-            'details' => sprintf('User %s logged out.', esc($userName))
-        ]);
-    
-        // Clear the user's session or authentication details
         CIAuth::forget();
     
-        // Redirect to the login page with a success message
         return redirect()->to(base_url('admin/login'))->with('success', 'You are logged out');
     }
+    
     
 
     public function getUsers()

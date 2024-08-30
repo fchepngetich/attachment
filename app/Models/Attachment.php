@@ -12,7 +12,7 @@ class Attachment extends Model
         'student_id', 'company_name', 'company_location', 'county', 'company_email',
         'company_phone', 'date_start', 'date_end', 'google_map', 'supervisor_id','supervisor_comments',
         'assessment_confirmed_at', 'is_assessment_confirmed','student_confirmation_date','is_student_confirmed',
-         'visit_scheduled_at', 'visit_status','schedule_cleared'
+         'visit_scheduled_at', 'visit_status','schedule_cleared','student_comments','student_signature'
     ];
     public function getAttachmentsByStudentId($studentId)
     {

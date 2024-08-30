@@ -278,35 +278,8 @@ class StudentsController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Failed to create attachment');
         }
     }
-    public function confirmAssessmentByStudent()
-    {
-        // Load helper and models
-        helper(['form']);
-        $attachmentModel = new Attachment();
-
-        // Get POST data
-        $attachmentId = $this->request->getPost('attachment_id');
-        $signature = $this->request->getPost('signature');
-        $comments = $this->request->getPost('comments');
-
-        // Validate input
-        if (empty($attachmentId) || empty($signature)) {
-            return redirect()->back()->with('error', 'Attachment ID and signature are required.');
-        }
-
-        // Update the database with the signature
-        $updateData = [
-            'is_student_confirmed' => 1,
-            'student_signature' => $signature, // Assuming the column name is 'student_signature'
-            'comments' => $comments
-        ];
-
-        if ($attachmentModel->update($attachmentId, $updateData)) {
-            return redirect()->back()->with('success', 'Assessment confirmed successfully.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to confirm assessment.');
-        }
-    }
+ 
+    
     
 
     public function newgetCoursesBySchool()

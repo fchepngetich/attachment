@@ -76,12 +76,7 @@ class AuthController extends BaseController
                 return redirect()->to(base_url('admin/login'))->with('fail', 'Wrong password')->withInput();
             } else {
                 CIAuth::CIAuth($userInfo);
-                $logModel = new Logs();
-                $logModel->save([
-                    'user_id' =>CIAuth::id(),
-                    'action' => 'User Logged in',
-                    'details' => 'User Logged in Success'
-                ]);
+               
                 if ($userInfo['password_reset_required'] == 0) {
                     return redirect()->to(base_url('admin/change-password'))->with('info', 'Please change your password on first login.');
                 }
@@ -89,6 +84,12 @@ class AuthController extends BaseController
                 if ($isStudent) {
                     return redirect()->to(base_url('admin/attachmentlist'));
                 } else {
+                    $logModel = new Logs();
+                    $logModel->save([
+                        'user_id' =>CIAuth::id(),
+                        'action' => 'User Logged in',
+                        'details' => 'User Logged in Success'
+                    ]);
                     return redirect()->to(base_url('admin/home'));
                 }
             }

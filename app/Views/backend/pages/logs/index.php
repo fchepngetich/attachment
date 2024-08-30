@@ -1,6 +1,6 @@
 <?= $this->extend('backend/layout/pages-layout') ?>
 <?= $this->section('content') ?>
-
+<div class="container">
 <div class="page-header">
     <div class="row">
         <div class="col-md-6 col-sm-12">
@@ -38,7 +38,7 @@
         </tbody>
     </table>
 </div></div></div>
-
+</div>
 <?= $this->endSection() ?>
 
 <?= $this->section('stylesheets')?>
